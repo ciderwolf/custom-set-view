@@ -30,7 +30,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .card-grid-item {
   display: block;
   position: relative;
@@ -70,7 +70,7 @@ export default {
 .card {
   width: 100%;
   height: 100%;
-  border-radius: 10px;
+  border-radius: 4%;
   -webkit-box-shadow: 1px 1px 6px rgba(0,0,0,0.45);
   box-shadow: 1px 1px 6px rgba(0,0,0,0.45);
 }

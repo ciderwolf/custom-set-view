@@ -88,8 +88,7 @@ export function search(query: string): Card[] {
   if (conditions === undefined) {
     return [];
   }
-  return set.cards
-    .filter((card) => cardMatchesConditions(conditions, card));
+  return set.cards.filter((card) => cardMatchesConditions(conditions, card));
 }
 
 export function getCards(): Card[] {

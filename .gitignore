@@ -27,3 +27,4 @@ pnpm-debug.log*
 src/query.js
 src/assets/data.json
 public/img/*
+*.woff
