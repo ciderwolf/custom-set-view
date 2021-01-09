@@ -21,3 +21,9 @@ pnpm-debug.log*
 *.njsproj
 *.sln
 *.sw?
+
+
+# Set files
+src/query.js
+src/assets/data.json
+public/img/*
