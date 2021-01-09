@@ -20,6 +20,11 @@ const routes: Array<RouteConfig> = [
     name: 'Card',
     component: () => import(/* webpackChunkName: "card-detail" */ '../views/CardDetail.vue'),
   },
+  {
+    path: '/advanced',
+    name: 'Advancd Search',
+    component: () => import(/* webpackChunkName: "advanced-search" */ '../views/AdvancedSearch.vue'),
+  },
 ];
 
 const router = new VueRouter({
