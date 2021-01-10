@@ -1,9 +1,11 @@
 <template>
   <div class="home">
-    <img alt="IEX logo" src="../assets/logo.png">
+    <img src="@/assets/heron_large.png" width=256>
     <form @submit="search">
-      <input type="text" placeholder="Search for cards..." v-model="searchText">
+      <input type="text" placeholder="Search for cards..." v-model="searchText" id="search-field">
     </form>
+    <a href="/deckbuilder/">Deckbuilder</a>
+    <p class="version">Innistrad Exhumed 3.7</p>
   </div>
 </template>
 
@@ -28,16 +30,38 @@ export default {
 
 <style scoped>
 .home {
+  margin: 0 auto;
+  margin-top: 15vh;
+  width: fit-content;
+  align-items: center;
   display: flex;
   flex-direction: column;
-  width: min-content;
-  margin: 0 auto;
 }
 
-.home input {
-  padding: 6px 8px;
-  font-size: 14px;
-  border: 1px solid #aaaaaa;
+#search-field {
+  font-size: 18px;
+  padding: 10px;
+  width: 300px;
   outline: none;
+}
+
+form {
+  margin-top: 10vh;
+}
+
+a {
+  color: blue;
+  text-decoration: none;
+  margin-top: 20px;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.version {
+  color: gray;
+  position: absolute;
+  bottom: 13px;
 }
 </style>

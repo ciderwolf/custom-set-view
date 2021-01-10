@@ -25,6 +25,11 @@ const routes: Array<RouteConfig> = [
     name: 'Advancd Search',
     component: () => import(/* webpackChunkName: "advanced-search" */ '../views/AdvancedSearch.vue'),
   },
+  {
+    path: '/search/syntax',
+    name: 'Advancd Search',
+    component: () => import(/* webpackChunkName: "syntax-help" */ '../views/SyntaxHelp.vue'),
+  },
 ];
 
 const router = new VueRouter({
