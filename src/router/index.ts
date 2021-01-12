@@ -27,8 +27,13 @@ const routes: Array<RouteConfig> = [
   },
   {
     path: '/search/syntax',
-    name: 'Advancd Search',
+    name: 'Syntax Help',
     component: () => import(/* webpackChunkName: "syntax-help" */ '../views/SyntaxHelp.vue'),
+  },
+  {
+    path: '/deckbuilder',
+    name: 'Deckbuilder',
+    component: () => import(/* webpackChunkName: "deckbuilder" */ '../views/Deckbuilder.vue'),
   },
 ];
 
