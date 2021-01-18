@@ -20,10 +20,10 @@ class DecklistStore {
 
   constructor() {
     this.decklists = JSON.parse(window.localStorage.getItem('decks') ?? '{}');
-    this.currentDeckName = window.localStorage.getItem('currentDeckName') ?? '';
+    this.currentDeckName = JSON.parse(window.localStorage.getItem('currentDeckName') ?? '""');
     window.onbeforeunload = () => {
       window.localStorage.setItem('decks', JSON.stringify(this.decklists));
-      window.localStorage.setItem('currentDeckName', this.currentDeckName);
+      window.localStorage.setItem('currentDeckName', JSON.stringify(this.currentDeckName));
     };
   }
 

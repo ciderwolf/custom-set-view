@@ -4,7 +4,7 @@
     <form @submit="search">
       <input type="text" placeholder="Search for cards..." v-model="searchText" id="search-field">
     </form>
-    <a href="/deckbuilder/">Deckbuilder</a>
+    <router-link to="/deckbuilder">Deckbuilder</router-link>
     <p class="version">Innistrad Exhumed 3.7</p>
   </div>
 </template>
