@@ -38,6 +38,9 @@ const allCards = getCards();
 const basicLands = ['Plains', 'Island', 'Swamp', 'Mountain', 'Forest', 'Wastes'];
 
 function findCard(name) {
+  if (basicLands.includes(name)) {
+    return { name };
+  }
   const foundCard = Object.values(allCards)
     .find((card) => (card.name === name || card.simple_name === name));
   return foundCard || null;
