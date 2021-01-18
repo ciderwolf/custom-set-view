@@ -138,6 +138,9 @@ function getColors(cards) {
   let colorSum = 0;
   cards.forEach((card) => {
     const cardObject = findCard(card.name);
+    if (cardObject === null) {
+      return;
+    }
     const cardCost = cardObject.cost || '';
     Array.from(cardCost).forEach((symbol) => {
       if (symbol in colors) {
