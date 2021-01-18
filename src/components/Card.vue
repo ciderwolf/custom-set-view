@@ -37,7 +37,7 @@ export default {
   -webkit-perspective: 2000px;
   perspective: 2000px;
   transition: 0.1s;
-  height: fill-available;
+  height: stretch;
 }
 
 .card-grid-item .card-faces {

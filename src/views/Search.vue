@@ -16,18 +16,22 @@
       <p id="search-error"></p>
     </div>
     <div id="card-img">
-      <router-link class="card-container" v-for="card in results" :key="card.name"
-        :to="'/search/card?name=' + card.simple_name">
-        <Card :card="card"/>
-      </router-link>
+      <div v-for="card in results" :key="card.name" class="card-container"
+      @mouseenter="hover(card.simple_name, true)" @mouseleave="hover(undefined, false)">
+        <router-link :to="'/search/card?name=' + card.simple_name">
+          <Card :card="card"/>
+        </router-link>
+      </div>
     </div>
     <h3 id="no-results" v-if="results.length === 0">No search results found</h3>
+    <added-cards ref="addedCards"/>
   </div>
 </template>
 
 <script>
 import { search, getCards } from '@/search';
 import Card from '@/components/Card.vue';
+import AddedCards from '@/components/AddedCards.vue';
 
 export default {
   data() {
@@ -36,6 +40,7 @@ export default {
       searchText: '',
       cards: [],
       results: [],
+      card: undefined,
     };
   },
   methods: {
@@ -50,13 +55,35 @@ export default {
     search() {
       this.results = search(this.searchText);
     },
+    hover(name, on) {
+      if (on) {
+        this.card = name;
+      } else {
+        this.card = undefined;
+      }
+    },
+    keyPressed(e) {
+      if ((e.key !== 'a' && e.key !== 's') || document.activeElement === document.getElementById('search-bar')) {
+        return;
+      }
+      if (this.card) {
+        this.$refs.addedCards.push(this.card, e.key === 's');
+        // this.$store.addCardToCurrentDeck(this.card, 1, e.key === 's');
+      }
+    },
   },
   mounted() {
     this.cards = getCards();
     this.searchText = this.$route.query.q || '';
     this.search();
   },
-  components: { Card },
+  created() {
+    window.addEventListener('keypress', this.keyPressed);
+  },
+  destroyed() {
+    window.removeEventListener('keypress', this.keyPressed);
+  },
+  components: { Card, AddedCards },
   name: 'Search',
 };
 </script>
@@ -102,50 +129,6 @@ export default {
 
 .show #decklist-alert {
   margin-right: 20px;
-}
-
-.slide-in {
-  overflow: hidden;
-}
-
-.slide-in.from-right {
-  right: 0;
-}
-
-.slide-in.from-left {
-  left: 0;
-}
-
-.slide-in-content {
-  padding: 5px 20px;
-  background: #eee;
-  transition: transform .5s ease;
-}
-
-.slide-in.from-right .slide-in-content {
-  transform: translateX(100%);
-  -webkit-transform: translateX(100%);
-}
-
-.slide-in.from-left .slide-in-content {
-  transform: translateX(-100%);
-  -webkit-transform: translateX(-100%);
-}
-
-.slide-in.show .slide-in-content {
-  transform: translateX(0%);
-  -webkit-transform: translateX(0%);
-}
-
-.alert {
-  width: 200px;
-  background: white;
-  padding: 10px;
-  border-radius: 3px;
-  border: 1px solid #555;
-  margin: 3px 0px;
-  cursor: pointer;
-  background: #fffe;
 }
 
 #search-container {

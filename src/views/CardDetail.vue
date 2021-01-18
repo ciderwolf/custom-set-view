@@ -6,7 +6,8 @@
             <div id="card-container">
               <Card :card="card"/>
             </div>
-            <button id="add-to-deck" class="button" @click="addCardClicked()">Add to Deck</button>
+            <button id="add-to-deck" class="button" @click="addCardClicked()">
+              Add to {{ shift ? "Sideboard" : "Deck" }}</button>
         </div>
         <div id="card-text">
           <div class="card-detail" v-for="face in faces" :key="face.name">
@@ -28,22 +29,25 @@
           </div>
         </div>
     </div>
+    <added-cards ref="addedCards"/>
   </div>
 </template>
 
 <script>
 import { getCards } from '@/search';
 import Card from '@/components/Card.vue';
+import AddedCards from '@/components/AddedCards.vue';
 
 export default {
   data() {
     return {
       card: null,
+      shift: false,
     };
   },
   methods: {
     addCardClicked() {
-      // TODO: Add card to deck
+      this.$refs.addedCards.push(this.card.name, this.shift);
     },
     processText(input) {
       let text = input.replace(/(\(.*\))/g, '<i>$1</i>');
@@ -52,6 +56,15 @@ export default {
       text = text.replace(/{(.)}/g, "<abbr class='card-symbol card-symbol-$1'>{$1}</abbr>");
       text = text.replace(/\n/g, '<br/>');
       return text;
+    },
+    keyListener(e) {
+      if (e.key === 'Shift') {
+        if (e.type === 'keyup') {
+          this.shift = false;
+        } else if (e.type === 'keydown') {
+          this.shift = true;
+        }
+      }
     },
   },
   name: 'CardDetail',
@@ -65,7 +78,15 @@ export default {
       face = face.back;
     }
   },
-  components: { Card },
+  created() {
+    document.addEventListener('keydown', this.keyListener);
+    document.addEventListener('keyup', this.keyListener);
+  },
+  destroyed() {
+    document.removeEventListener('keydown', this.keyListener);
+    document.removeEventListener('keyup', this.keyListener);
+  },
+  components: { Card, AddedCards },
 };
 </script>
 
@@ -140,50 +161,6 @@ p, .card-detail > i, b {
 .card-title .card-symbol {
   width: 18px;
   height: 18px;
-}
-
-.slide-in {
-  overflow: hidden;
-}
-
-.slide-in.from-right {
-  right: 0;
-}
-
-.slide-in.from-left {
-  left: 0;
-}
-
-.slide-in-content {
-  padding: 5px 20px;
-  background: #eee;
-  transition: transform .5s ease;
-}
-
-.slide-in.from-right .slide-in-content {
-  transform: translateX(100%);
-  -webkit-transform: translateX(100%);
-}
-
-.slide-in.from-left .slide-in-content {
-  transform: translateX(-100%);
-  -webkit-transform: translateX(-100%);
-}
-
-.slide-in.show .slide-in-content {
-  transform: translateX(0%);
-  -webkit-transform: translateX(0%);
-}
-
-.alert {
-  width: 200px;
-  background: white;
-  padding: 10px;
-  border-radius: 3px;
-  border: 1px solid #555;
-  margin: 3px 0px;
-  cursor: pointer;
-  background: #fffe;
 }
 
 .button {

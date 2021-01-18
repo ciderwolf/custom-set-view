@@ -54,14 +54,14 @@ class DecklistStore {
       if (match === undefined) {
         this.currentDeck.sideboard.push({ name: cardName, count });
       } else {
-        match.count += 1;
+        match.count += count;
       }
     } else {
       const match = this.currentDeck.maindeck.find((value) => value.name === cardName);
       if (match === undefined) {
         this.currentDeck.maindeck.push({ name: cardName, count });
       } else {
-        match.count += 1;
+        match.count += count;
       }
     }
   }
