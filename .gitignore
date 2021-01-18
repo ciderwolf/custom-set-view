@@ -28,3 +28,7 @@ src/query.js
 src/assets/data.json
 public/img/*
 *.woff
+
+# Data Files
+.mypy_cache
+__pycache__
