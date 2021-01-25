@@ -19,7 +19,7 @@
       <div v-for="card in results" :key="card.name" class="card-container"
       @mouseenter="hover(card.simple_name, true)" @mouseleave="hover(undefined, false)">
         <router-link :to="'/search/card?name=' + card.simple_name">
-          <Card :card="card"/>
+          <Card :card="card" size="small"/>
         </router-link>
       </div>
     </div>

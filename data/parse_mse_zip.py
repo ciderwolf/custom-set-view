@@ -214,6 +214,7 @@ if __name__ == "__main__":
     image_path = sys.argv[2]
     img_output = os.path.join(os.path.dirname(__file__), "../public/img")
     data_output = os.path.join(os.path.dirname(__file__), "../src/assets/data.json")
+    small_size = (255, 356)
 
     with ZipFile(set_path) as archive:
         with archive.open("set", "r") as datafile:
@@ -226,25 +227,51 @@ if __name__ == "__main__":
                 card["number"] = i + 1
                 card_dict[card["simple_name"]] = card
 
-            if os.path.exists(os.path.join(img_output, "img")):
-                shutil.rmtree(os.path.join(img_output, "img"))
-            os.mkdir(os.path.join(img_output, "img"))
+            if os.path.exists(os.path.join(img_output, "large/img")):
+                shutil.rmtree(os.path.join(img_output, "large/img"))
+            if os.path.exists(os.path.join(img_output, "small/img")):
+                shutil.rmtree(os.path.join(img_output, "small/img"))
+            os.makedirs(os.path.join(img_output, "large/img"))
+            os.makedirs(os.path.join(img_output, "small/img"))
             for land in ["Plains", "Island", "Swamp", "Mountain", "Forest"]:
-                shutil.copy(
-                    os.path.join(os.path.dirname(__file__), f"basics/{land}.jpg"),
-                    os.path.join(img_output, f"img/{land}.jpg"),
+                img = Image.open(
+                    os.path.join(os.path.dirname(__file__), f"basics/{land}.jpg")
                 )
-            if os.path.exists(os.path.join(img_output, "transform")):
-                shutil.rmtree(os.path.join(img_output, "transform"))
-            os.mkdir(os.path.join(img_output, "transform"))
+                img.save(os.path.join(img_output, f"large/img/{land}.jpg"))
+                img.resize(small_size).save(
+                    os.path.join(img_output, f"small/img/{land}.jpg")
+                )
+            if os.path.exists(os.path.join(img_output, "large/transform")):
+                shutil.rmtree(os.path.join(img_output, "large/transform"))
+            if os.path.exists(os.path.join(img_output, "small/transform")):
+                shutil.rmtree(os.path.join(img_output, "small/transform"))
+            os.makedirs(os.path.join(img_output, "large/transform"))
+            os.makedirs(os.path.join(img_output, "small/transform"))
 
             for key in card_dict.keys():
-                img_name = f"{key}.jpg"
-                img = Image.open(os.path.join(image_path, img_name))
-                img.save(os.path.join(img_output, f"img/{key}.jpg"))
+                img = Image.open(os.path.join(image_path, f"{key}.jpg"))
+                img.save(os.path.join(img_output, f"large/img/{key}.jpg"))
+
                 if card_dict[key]["dfc"]:
+                    img.resize((small_size[0] * 2 + 2, small_size[1])).save(
+                        os.path.join(img_output, f"small/img/{key}.jpg")
+                    )
                     left = img.crop((0, 0, img.size[0] / 2 - 1, img.size[1]))
                     right = img.crop((img.size[0] / 2 + 1, 0, img.size[0], img.size[1]))
-                    left.save(os.path.join(img_output, f"transform/{key}_front.jpg"))
-                    right.save(os.path.join(img_output, f"transform/{key}_back.jpg"))
+                    left.save(
+                        os.path.join(img_output, f"large/transform/{key}_front.jpg")
+                    )
+                    right.save(
+                        os.path.join(img_output, f"large/transform/{key}_back.jpg")
+                    )
+                    left.resize(small_size).save(
+                        os.path.join(img_output, f"small/transform/{key}_front.jpg")
+                    )
+                    right.resize(small_size).save(
+                        os.path.join(img_output, f"small/transform/{key}_back.jpg")
+                    )
+                else:
+                    img.resize(small_size).save(
+                        os.path.join(img_output, f"small/img/{key}.jpg")
+                    )
             json.dump(card_dict, open(data_output, "w"), indent=2)

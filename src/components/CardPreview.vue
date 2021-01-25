@@ -1,6 +1,6 @@
 <template>
   <div>
-    <img :style="style" class="card-preview" :src="`/img/img/${card.simpleName}.jpg`"/>
+    <img :style="style" class="card-preview" :src="`/img/large/img/${card.simpleName}.jpg`"/>
     <p
       class="card-line"
       @mouseleave="mouseLeave"

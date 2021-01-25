@@ -4,7 +4,7 @@
     <div style="display: flex;">
         <div style="display: flex; flex-direction: column;">
             <div id="card-container">
-              <Card :card="card"/>
+              <Card :card="card" size="large"/>
             </div>
             <button id="add-to-deck" class="button" @click="addCardClicked()">
               Add to {{ shift ? "Sideboard" : "Deck" }}</button>

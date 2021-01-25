@@ -5,10 +5,10 @@
       :class="{ flipped }">
     <button v-if="card.dfc" @click="flip" class="flip-button"></button>
     <div v-if="card.dfc" class="card-faces" :class="{ flipped }">
-      <img :src='`/img/transform/${card.simple_name}_front.jpg`' class="card card-front">
-      <img :src='`/img/transform/${card.simple_name}_back.jpg`' class="card card-back">
+      <img :src='`/img/${size}/transform/${card.simple_name}_front.jpg`' class="card card-front">
+      <img :src='`/img/${size}/transform/${card.simple_name}_back.jpg`' class="card card-back">
     </div>
-    <img :src="`/img/img/${this.card.simple_name}.jpg`" v-else class="card">
+    <img :src="`/img/${size}/img/${this.card.simple_name}.jpg`" v-else class="card">
   </div>
 </template>
 
@@ -26,7 +26,7 @@ export default {
     },
   },
   name: 'Card',
-  props: ['card'],
+  props: ['card', 'size'],
 };
 </script>
 
@@ -37,7 +37,7 @@ export default {
   -webkit-perspective: 2000px;
   perspective: 2000px;
   transition: 0.1s;
-  height: stretch;
+  height: 100%;
 }
 
 .card-grid-item .card-faces {
