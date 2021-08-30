@@ -12,7 +12,9 @@ function cardMatches(type: string, value: any, card: Card): boolean | undefined 
     return card.name.match(value) != null;
   } if (type === 'text') {
     const processedText = card.text.replace(new RegExp(card.name, 'g'), '~');
-    return processedText.match(value) != null || card.flavor.match(value) != null;
+    return processedText.match(value) != null
+    || card.flavor.match(value) != null
+    || card.text.match(value) != null;
   } if (type === 'allTypes') {
     const match = card.types.find((st) => st.toLowerCase() === value);
     return match !== undefined;
