@@ -4,8 +4,9 @@
     <form @submit="search">
       <input type="text" placeholder="Search for cards..." v-model="searchText" id="search-field">
     </form>
+    <i class="nav-hint">or press Enter to see all cards</i>
     <router-link to="/deckbuilder">Deckbuilder</router-link>
-    <p class="version">Innistrad Exhumed 3.7</p>
+    <p class="version">Innistrad Exhumed 4.2</p>
   </div>
 </template>
 
@@ -22,6 +23,17 @@ export default {
       this.$router.push(`/search?q=${this.searchText}`);
       e.preventDefault();
     },
+    keyPressed(e) {
+      if (e.keyCode === 13) {
+        this.$router.push(`/search?q=${this.searchText}`);
+      }
+    },
+  },
+  created() {
+    window.addEventListener('keypress', this.keyPressed);
+  },
+  destroyed() {
+    window.removeEventListener('keypress', this.keyPressed);
   },
   components: {
   },
@@ -36,6 +48,10 @@ export default {
   align-items: center;
   display: flex;
   flex-direction: column;
+}
+
+.nav-hint {
+  color: #555;
 }
 
 #search-field {

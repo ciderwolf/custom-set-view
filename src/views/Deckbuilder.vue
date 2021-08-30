@@ -1,9 +1,9 @@
 <template>
   <div>
     <div id="title">
-      <a href="/"><img src="@/assets/heron_small.png" id="heron-logo" /></a>
+      <router-link to="/"><img src="@/assets/heron_small.png" id="heron-logo" /></router-link>
       <h1>Deckbuilder</h1>
-      <a href="/search">Search for Cards</a>
+      <router-link to="/search">Search for Cards</router-link>
       <img src="@/assets/gear.svg" id="options-button" @click="showModal()">
     </div>
     <h2>{{ $store.currentDeckName }}

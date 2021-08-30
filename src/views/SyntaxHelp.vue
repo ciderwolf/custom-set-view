@@ -5,8 +5,8 @@
       <h1>Search Syntax</h1>
     </div>
     <div id="navigation">
-      <a href="/search">Search</a>
-      <a href="/search/advanced/"><i>Advanced Search</i></a>
+      <router-link to="/search">Search</router-link>
+      <router-link to="/search/advanced/"><i>Advanced Search</i></router-link>
     </div>
     <div class="modifier">
       <h3>Card Colors</h3>
