@@ -68,7 +68,6 @@ export default {
       }
       if (this.card) {
         this.$refs.addedCards.push(this.card, e.key === 's');
-        // this.$store.addCardToCurrentDeck(this.card, 1, e.key === 's');
       }
     },
   },

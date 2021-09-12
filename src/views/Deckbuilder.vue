@@ -6,7 +6,7 @@
       <router-link to="/search">Search for Cards</router-link>
       <img src="@/assets/gear.svg" id="options-button" @click="showModal()">
     </div>
-    <h2>{{ $store.currentDeckName }}
+    <h2>{{ currentDeckName }}
       ({{ deckSize('maindeck') }}/{{ deckSize('sideboard') }})</h2>
     <div id="deck-options" @click="dismissModal">
       <span @click="dismissModal()">&times;</span>
@@ -18,7 +18,7 @@
             @input="selectDeck(this)"
             v-model="options.selectedDeck">
             <option disabled>Choose a deck</option>
-            <option v-for="name in $store.deckNames" :key="name" :value="name">{{name}}</option>
+            <option v-for="name in deckNames" :key="name" :value="name">{{name}}</option>
           </select>
         </div>
         <hr />
@@ -123,7 +123,7 @@ export default {
         }
         return undefined;
       }).filter((x) => x !== undefined);
-      this.$store.currentDeck = deck;
+      this.$decks.currentDeck = deck;
       this.deck = deck;
     },
     showModal() {
@@ -136,28 +136,28 @@ export default {
       }
     },
     deckSize(name) {
-      const deck = this.$store.currentDeck[name];
+      const deck = this.$decks.currentDeck[name];
       const size = deck.reduce((acc, item) => acc + item.count, 0);
       return size;
     },
     renameDeck() {
-      this.$store.setCurrentDeckName(this.options.deckName);
+      this.$decks.setCurrentDeckName(this.options.deckName);
       this.dismissModal();
       this.chooseDeck();
     },
     createNewDeck() {
-      this.deck = this.$store.newDeck(this.options.newDeckName);
+      this.deck = this.$decks.newDeck(this.options.newDeckName);
       this.dismissModal();
       this.chooseDeck();
     },
     selectDeck() {
-      this.$store.currentDeckName = this.$refs.deckSelector.value;
+      this.$decks.currentDeckName = this.$refs.deckSelector.value;
       this.dismissModal();
       this.chooseDeck();
     },
     deleteDeck() {
-      this.$store.deleteCurrentDeck();
-      this.options.selectedDeck = this.$store.currentDeckName;
+      this.$decks.deleteCurrentDeck();
+      this.options.selectedDeck = this.$store.getters.currentDeckName;
       this.dismissModal();
       this.chooseDeck();
     },
@@ -176,7 +176,7 @@ export default {
         const a = document.createElement('a');
         a.style.display = 'none';
         a.href = url;
-        a.download = `${this.$store.currentDeckName}.txt`;
+        a.download = `${this.currentDeckName}.txt`;
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);
@@ -184,14 +184,22 @@ export default {
       }
     },
     chooseDeck() {
-      this.deck = this.$store.currentDeck;
+      this.deck = this.$store.getters.currentDeck;
       this.maindeck = this.deck.maindeck.map((card) => `${card.count} ${card.name}`).join('\n');
       this.sideboard = this.deck.sideboard.map((card) => `${card.count} ${card.name}`).join('\n');
     },
   },
   mounted() {
-    this.options.selectedDeck = this.$store.currentDeckName;
+    this.options.selectedDeck = this.currentDeckName;
     this.chooseDeck();
+  },
+  computed: {
+    currentDeckName() {
+      return this.$store.getters.currentDeckName;
+    },
+    deckNames() {
+      return this.$store.getters.deckNames;
+    },
   },
   components: { Tab, Tabs, DeckPreview },
 };

@@ -25,7 +25,7 @@ export default {
       } else {
         this.notifications.push({ name, sideboard, count: 1 });
       }
-      this.$store.addCardToCurrentDeck(name, 1, sideboard);
+      this.$decks.addCardToCurrentDeck(name, 1, sideboard);
     },
     removeNotification(index) {
       this.notifications.splice(index, 1);
