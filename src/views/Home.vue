@@ -6,7 +6,7 @@
     </form>
     <i class="nav-hint">or press Enter to see all cards</i>
     <router-link to="/deckbuilder">Deckbuilder</router-link>
-    <p class="version">Innistrad Exhumed 4.2</p>
+    <p class="version">Innistrad Exhumed 4.6</p>
   </div>
 </template>
 

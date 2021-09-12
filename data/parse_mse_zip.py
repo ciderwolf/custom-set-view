@@ -249,7 +249,7 @@ if __name__ == "__main__":
             os.makedirs(os.path.join(img_output, "small/transform"))
 
             for key in card_dict.keys():
-                img = Image.open(os.path.join(image_path, f"{key}.jpg"))
+                img = Image.open(os.path.join(image_path, f"{key}.png"))
                 img.save(os.path.join(img_output, f"large/img/{key}.jpg"))
 
                 if card_dict[key]["dfc"]:
