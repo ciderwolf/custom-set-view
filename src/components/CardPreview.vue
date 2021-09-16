@@ -19,7 +19,7 @@ export default {
         left: 0,
         top: 0,
       },
-      height: 128,
+      height: 330,
     };
   },
   methods: {

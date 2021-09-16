@@ -25,6 +25,21 @@ export const store = new Vuex.Store({
     setDecklists(state, decklists) {
       state.decklists = decklists;
     },
+    renameCurrentDeck(state, newName: string) {
+      const deck = state.decklists[state.currentDeckName];
+      Vue.delete(state.decklists, state.currentDeckName);
+      state.currentDeckName = newName;
+      Vue.set(state.decklists, state.currentDeckName, deck);
+    },
+    addDeck(state) {
+      Vue.set(state.decklists, state.currentDeckName, { maindeck: [], sideboard: [] });
+    },
+    removeDeck(state) {
+      Vue.delete(state.decklists, state.currentDeckName);
+    },
+    setDeck(state, deck: Deck) {
+      Vue.set(state.decklists, state.currentDeckName, deck);
+    },
   },
   getters: {
     currentDeckName(state) {
@@ -47,7 +62,7 @@ export class DecklistStore {
     this.decklists = JSON.parse(window.localStorage.getItem('decks') ?? '{}');
     this.currentDeckName = JSON.parse(window.localStorage.getItem('currentDeckName') ?? '""');
     if (this.currentDeckName === '') {
-      this.newDeck('New Deck');
+      this.createNewDeck('New Deck');
     }
     window.onbeforeunload = () => {
       window.localStorage.setItem('decks', JSON.stringify(this.decklists));
@@ -73,23 +88,23 @@ export class DecklistStore {
 
   public get currentDeck(): Deck {
     if (this.decklists[this.currentDeckName] === undefined) {
-      this.decklists[this.currentDeckName] = { maindeck: [], sideboard: [] };
+      store.commit('addDeck');
     }
 
     return this.decklists[this.currentDeckName];
   }
 
-  public set currentDeck(deck: Deck) {
-    this.decklists[this.currentDeckName] = deck;
-  }
-
   public get deckNames(): string[] {
-    return Object.keys(this.decklists);
+    return store.getters.deckNames;
   }
 
-  public newDeck(name: string): Deck {
-    this.currentDeckName = name;
+  public createNewDeck(name: string): Deck {
+    this.currentDeckName = name || 'New Deck';
     return this.currentDeck;
+  }
+
+  public selectDeck(name: string) {
+    this.currentDeckName = name;
   }
 
   public addCardToCurrentDeck(cardName: string, count = 1, sideboard = false) {
@@ -111,14 +126,15 @@ export class DecklistStore {
   }
 
   public setCurrentDeckName(newName: string) {
-    const deck = this.decklists[this.currentDeckName];
-    delete this.decklists[this.currentDeckName];
-    this.decklists[newName] = deck;
-    this.currentDeckName = newName;
+    store.commit('renameCurrentDeck', newName);
+  }
+
+  public setCurrentDeck(deck: Deck) {
+    store.commit('setDeck', deck);
   }
 
   public deleteCurrentDeck() {
-    delete this.decklists[this.currentDeckName];
+    store.commit('removeDeck');
     if (this.deckNames.length > 0) {
       this.currentDeckName = this.deckNames[this.deckNames.length - 1];
     } else {

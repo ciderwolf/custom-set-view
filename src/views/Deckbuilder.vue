@@ -14,8 +14,7 @@
         <h2>Deck Options</h2>
         <div class="option">
           <label for="deck-selector">Select Deck: </label>
-          <select ref="deckSelector"
-            @input="selectDeck(this)"
+          <select
             v-model="options.selectedDeck">
             <option disabled>Choose a deck</option>
             <option v-for="name in deckNames" :key="name" :value="name">{{name}}</option>
@@ -123,7 +122,7 @@ export default {
         }
         return undefined;
       }).filter((x) => x !== undefined);
-      this.$decks.currentDeck = deck;
+      this.$decks.setCurrentDeck(deck);
       this.deck = deck;
     },
     showModal() {
@@ -136,22 +135,22 @@ export default {
       }
     },
     deckSize(name) {
-      const deck = this.$decks.currentDeck[name];
+      const deck = this.currentDeck[name];
       const size = deck.reduce((acc, item) => acc + item.count, 0);
       return size;
     },
     renameDeck() {
       this.$decks.setCurrentDeckName(this.options.deckName);
+      this.options.selectedDeck = this.options.deckName;
       this.dismissModal();
-      this.chooseDeck();
     },
     createNewDeck() {
-      this.deck = this.$decks.newDeck(this.options.newDeckName);
+      this.deck = this.$decks.createNewDeck(this.options.newDeckName);
       this.dismissModal();
       this.chooseDeck();
     },
     selectDeck() {
-      this.$decks.currentDeckName = this.$refs.deckSelector.value;
+      this.$decks.selectDeck(this.options.selectedDeck);
       this.dismissModal();
       this.chooseDeck();
     },
@@ -193,9 +192,17 @@ export default {
     this.options.selectedDeck = this.currentDeckName;
     this.chooseDeck();
   },
+  watch: {
+    'options.selectedDeck': function selectedDeckUpdated() {
+      this.selectDeck();
+    },
+  },
   computed: {
     currentDeckName() {
       return this.$store.getters.currentDeckName;
+    },
+    currentDeck() {
+      return this.$store.getters.currentDeck;
     },
     deckNames() {
       return this.$store.getters.deckNames;
@@ -256,11 +263,25 @@ export default {
   font-size: 14px;
   border: 1px solid #555;
   border-radius: 5px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.button:hover {
+  background: #0001;
+}
+.button:hover:active {
+  background: #0003;
 }
 
 .button.danger {
   border-color: maroon;
   color: maroon;
+}
+.button.danger:hover {
+  background: #80000011;
+}
+.button.danger:hover:active {
+  background: #80000033;
 }
 
 #title {
