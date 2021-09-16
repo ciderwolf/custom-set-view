@@ -45,7 +45,7 @@ def compare_cards(a, b) -> int:
 
 
 def strip_tags(text: str) -> str:
-    return re.sub(r"</?[a-zA-Z0-9\-:/._]+>", "", text)
+    return re.sub(r"</?[a-zA-Z0-9\-:/._]+>", "", text).strip()
 
 
 def process_tag(match: re.Match) -> str:
@@ -84,30 +84,75 @@ def get_types(super_t: str, sub_t: str) -> Tuple[str, List[str]]:
     return typeline, types
 
 
+def saga_stats(card):
+    extra_card_styles = card["styling data"]
+    textboxes = ["zero", "one", "two", "three", "four", "five"].index(
+        extra_card_styles["chapter textboxes"]
+    )
+    roman_numerals = {1: "I", 2: "II", 3: "III", 4: "IV", 5: "V"}
+
+    divider_coords_raw: str = extra_card_styles["chapter divider coordinates"]
+    divider_coords = divider_coords_raw.strip(", ").split(",")
+    if divider_coords == [""]:
+        divider_coords = []
+
+    number_coords_raw: str = extra_card_styles["chapter number coordinates"]
+    number_coords = number_coords_raw.strip(", ").split(",")
+    if number_coords == [""]:
+        number_coords = []
+    chapter_count = len(number_coords)
+
+    splits = [
+        int(divider_coords[0])
+        if len(divider_coords) > 0
+        else (296 if textboxes == 2 else (255 if textboxes == 4 else 249)),
+        int(divider_coords[1])
+        if len(divider_coords) > 1
+        else (437 if textboxes == 2 else (296 if textboxes == 4 else 343)),
+        int(divider_coords[2])
+        if len(divider_coords) > 2
+        else (437 if textboxes == 2 else (367 if textboxes == 4 else 600)),
+    ]
+
+    chapters = [
+        int(number_coords[0])
+        if chapter_count > 0
+        else (183 if textboxes == 2 else 185),
+        int(number_coords[1])
+        if chapter_count > 1
+        else (223 if textboxes == 2 else 279),
+        int(number_coords[2])
+        if chapter_count > 2
+        else (329 if textboxes == 2 else 373),
+        int(number_coords[3]) if chapter_count > 3 else 600,
+        int(number_coords[4]) if chapter_count > 4 else 600,
+        int(number_coords[5]) if chapter_count > 5 else 600,
+    ]
+
+    number_index = 0
+    saga_info = []
+    for i in range(textboxes):
+        badges = []
+        while number_index < chapter_count and chapters[number_index] < splits[i]:
+            number_index += 1
+            badges.append(roman_numerals[number_index])
+        badge_text = (", ".join(badges) + " \u2014 ") if badges else ""
+        saga_info.append(badge_text + card["level " + str(i + 1) + " text"])
+
+    return "\n".join(saga_info)
+
+
 def parse_text(card) -> Tuple[str, str]:
     style = card["stylesheet"]
     text = card.get("rule text", "")
     flavor = card.get("flavor text", "")
-    if "saga" in style and "level 3 text" in card:
-        text += "\nI — " + card["level 1 text"]
-        text += "\nII — " + card["level 2 text"]
-        text += "\nIII — " + card["level 3 text"]
-    elif "Planeswalker" in card["super type"] and "rule text" in card:
-        ability_count = (
-            (strip_tags(text) + "\n" + strip_tags(flavor)).strip().split("\n")
-        )
-        if flavor:
-            text += "\n" + flavor.strip()
-        abilities = text.split("\n")
-        text = ""
-        flavor = ""
-        for i in range(1, len(ability_count) + 1):
-            cost = card[f"loyalty cost {i}"]
-            abilities[i - 1] = cost + ": " + abilities[i - 1]
-
-        text = "\n".join(abilities)
-    elif "Planeswalker" in card["super type"] and "rule text" not in card:
+    if "saga" in style:
+        text += "\n" + saga_stats(card)
+    elif "Planeswalker" in card["super type"]:
         abilities = []
+        if "level 1 text" not in card:
+            card["level 1 text"] = card["rule text"]
+
         for i in range(1, 5):
             if f"level {i} text" in card and f"loyalty cost {i}" in card:
                 ability = card[f"level {i} text"]
@@ -115,6 +160,7 @@ def parse_text(card) -> Tuple[str, str]:
                 abilities.append((cost, ability))
         ability_text = [(x + ": " if x else "") + y for x, y in abilities]
 
+        flavor = ""
         text = "\n".join(ability_text)
 
     return text, flavor
@@ -173,7 +219,7 @@ def process_data(cards: List[dict]) -> list:
             else "C"
         )
 
-        color = "".join(set(re.sub(r"[\d+X ]", "", combined_cost)))
+        color = "".join(sorted(set(re.sub(r"[\d+X ]", "", combined_cost))))
         typeline, types = get_types(card["super type"], card["sub type"])
 
         if "rarity" not in card:

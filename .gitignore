@@ -26,6 +26,7 @@ pnpm-debug.log*
 # Set files
 src/query.js
 src/assets/data.json
+data/btk.json
 public/img/*
 *.woff
 
