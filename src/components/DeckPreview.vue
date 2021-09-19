@@ -25,6 +25,10 @@
           <h3>{{ sideboard.title }} ({{ sideboard.count }})</h3>
           <card-preview v-for="card of sideboard.cards" :key="card.name" :card="card"/>
         </div>
+        <div class="type" v-if="unknowns.count > 0">
+          <h3>{{ unknowns.title }} ({{ unknowns.count }})</h3>
+          <p v-for="card of unknowns.cards" :key="card.name">{{ card.count }} {{ card.name }}</p>
+        </div>
       </div>
     </div>
   </div>
@@ -39,7 +43,8 @@ const basicLands = ['Plains', 'Island', 'Swamp', 'Mountain', 'Forest', 'Wastes']
 
 function findCard(name) {
   if (basicLands.includes(name)) {
-    return { name };
+    // eslint-disable-next-line @typescript-eslint/camelcase
+    return { name, simple_name: name };
   }
   const foundCard = Object.values(allCards)
     .find((card) => (card.name === name || card.simple_name === name));
@@ -96,9 +101,11 @@ function makeColumns(decklist) {
 
 function makeDecklist(deck) {
   const decklist = {};
+  const unknowns = [];
   deck.maindeck.forEach((card) => {
     const cardObj = findCard(card.name);
     if (cardObj === null) {
+      unknowns.push(card);
       return;
     }
 
@@ -109,22 +116,23 @@ function makeDecklist(deck) {
     decklist[type].push({
       count: card.count,
       name: cardObj.name,
-      simpleName: card.name,
+      simpleName: cardObj.simple_name,
     });
   });
 
   const sideboard = deck.sideboard.map((card) => {
     const cardObj = findCard(card.name);
     if (cardObj === null) {
+      unknowns.pushS(card);
       return undefined;
     }
     return {
       count: card.count,
       name: cardObj.name,
-      simpleName: card.name,
+      simpleName: cardObj.simple_name,
     };
   }).filter((x) => x !== undefined);
-  return [...makeColumns(decklist), createColumn('Sideboard', sideboard)];
+  return [...makeColumns(decklist), createColumn('Sideboard', sideboard), createColumn('Unknown', unknowns)];
 }
 
 function getColors(cards) {
@@ -169,6 +177,7 @@ export default {
       rowOne: [],
       rowTwo: [],
       sideboard: {},
+      unknowns: {},
       colors: {
         W: {},
         U: {},
@@ -180,11 +189,13 @@ export default {
   },
   watch: {
     deck() {
-      const [one, two, sideboard] = makeDecklist(this.deck);
+      const [one, two, sideboard, unknowns] = makeDecklist(this.deck);
+      console.log(unknowns, sideboard);
       this.colors = getColors([...this.deck.maindeck, ...this.deck.sideboard]);
       this.rowOne = one;
       this.rowTwo = two;
       this.sideboard = sideboard;
+      this.unknowns = unknowns;
     },
   },
   props: ['deck'],
@@ -231,5 +242,10 @@ export default {
 
 .type {
   padding: 20px;
+}
+
+.type p {
+  margin-top: 0;
+  margin-bottom: 0;
 }
 </style>

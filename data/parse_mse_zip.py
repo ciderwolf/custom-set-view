@@ -167,7 +167,7 @@ def parse_text(card) -> Tuple[str, str]:
 
 
 def get_back_face(card):
-    if "name 2" not in card:
+    if not card.get("name 2"):
         return None
     elif "rule text 2" not in card:
         # Bind // Torture // Kill
