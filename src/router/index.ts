@@ -53,6 +53,14 @@ const routes: Array<RouteConfig> = [
       title: 'Deckbuilder | Innistrad Exhumed',
     },
   },
+  {
+    path: '*',
+    name: 'Error 404',
+    component: () => import(/* webpackChunkName: "error404" */ '../views/404.vue'),
+    meta: {
+      title: 'Not Found | Innistrad Exhumed',
+    },
+  },
 ];
 
 const router = new VueRouter({

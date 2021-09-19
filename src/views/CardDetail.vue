@@ -77,6 +77,10 @@ export default {
       this.faces.push(face);
       face = face.back;
     }
+
+    if (!this.card) {
+      this.$router.replace(`not-found?name=${name}`);
+    }
   },
   created() {
     document.addEventListener('keydown', this.keyListener);
