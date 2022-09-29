@@ -32,6 +32,16 @@ export const store = new Vuex.Store({
       Vue.set(state.decklists, state.currentDeckName, deck);
     },
     addDeck(state) {
+      let name = state.currentDeckName;
+      let count = 1;
+      while (Object.keys(state.decklists).includes(name)) {
+        count += 1;
+        name = `${state.currentDeckName} (${count})`;
+      }
+      console.log(name, state.currentDeckName, Object.keys(state.decklists));
+      if (name !== state.currentDeckName) {
+        state.currentDeckName = name;
+      }
       Vue.set(state.decklists, state.currentDeckName, { maindeck: [], sideboard: [] });
     },
     removeDeck(state) {
@@ -100,7 +110,13 @@ export class DecklistStore {
 
   public createNewDeck(name: string): Deck {
     this.currentDeckName = name || 'New Deck';
+    store.commit('addDeck');
     return this.currentDeck;
+  }
+
+  public addDeck(name: string, deck: Deck) {
+    this.createNewDeck(name);
+    this.setCurrentDeck(deck);
   }
 
   public selectDeck(name: string) {

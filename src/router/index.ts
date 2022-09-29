@@ -54,6 +54,14 @@ const routes: Array<RouteConfig> = [
     },
   },
   {
+    path: '/deck',
+    name: 'Deck Preview',
+    component: () => import(/* webpackChunkName: "deck-preview" */ '../views/SharedDeck.vue'),
+    meta: {
+      title: 'Deck Preview | Innistrad Exhumed',
+    },
+  },
+  {
     path: '*',
     name: 'Error 404',
     component: () => import(/* webpackChunkName: "error404" */ '../views/404.vue'),

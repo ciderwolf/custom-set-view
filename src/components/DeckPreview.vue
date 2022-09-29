@@ -36,35 +36,7 @@
 
 <script>
 import CardPreview from '@/components/CardPreview.vue';
-import { getCards } from '@/search';
-
-const allCards = getCards();
-const basicLands = ['Plains', 'Island', 'Swamp', 'Mountain', 'Forest', 'Wastes'];
-
-function findCard(name) {
-  if (basicLands.includes(name)) {
-    // eslint-disable-next-line @typescript-eslint/camelcase
-    return { name, simple_name: name };
-  }
-  const foundCard = Object.values(allCards)
-    .find((card) => (card.name === name || card.simple_name === name));
-  return foundCard || null;
-}
-
-function getType(card, name) {
-  if (basicLands.includes(name)) {
-    return 'Land';
-  } if (card === undefined) {
-    return 'Unknown';
-  }
-  let type;
-  let counter = 0;
-  do {
-    type = card.types[counter];
-    counter += 1;
-  } while (type === 'Legendary');
-  return type;
-}
+import { findCard, getType } from '@/deck';
 
 function createColumn(typename, cardlist) {
   const size = cardlist.reduce((acc, item) => acc + item.count, 0);
@@ -123,7 +95,7 @@ function makeDecklist(deck) {
   const sideboard = deck.sideboard.map((card) => {
     const cardObj = findCard(card.name);
     if (cardObj === null) {
-      unknowns.pushS(card);
+      unknowns.push(card);
       return undefined;
     }
     return {
@@ -187,15 +159,22 @@ export default {
       },
     };
   },
-  watch: {
-    deck() {
+  methods: {
+    displayDeck() {
       const [one, two, sideboard, unknowns] = makeDecklist(this.deck);
-      console.log(unknowns, sideboard);
       this.colors = getColors([...this.deck.maindeck, ...this.deck.sideboard]);
       this.rowOne = one;
       this.rowTwo = two;
       this.sideboard = sideboard;
       this.unknowns = unknowns;
+    },
+  },
+  mounted() {
+    this.displayDeck();
+  },
+  watch: {
+    deck() {
+      this.displayDeck();
     },
   },
   props: ['deck'],

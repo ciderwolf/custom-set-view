@@ -41,6 +41,13 @@
           </div>
           <button class="button danger" @click="deleteDeck()">Delete Deck</button>
         </div>
+        <hr />
+        <div class="option">
+          <div>
+            <input type="text" v-model="deckCodeURL" placeholder="Deck URL">
+          </div>
+          <button class="button" @click="generateCode()">Generate Shareable URL</button>
+        </div>
       </div>
     </div>
     <div id="deckbuilder">
@@ -67,6 +74,19 @@
 <script>
 import { Tabs, Tab } from 'vue-tabs-component';
 import DeckPreview from '@/components/DeckPreview.vue';
+import { findCard } from '@/deck';
+
+function makeCode(deck, name) {
+  const maindeck = deck.maindeck.map((card) => {
+    const obj = findCard(card.name);
+    return `${card.count} ${obj.number}`;
+  }).join('\t');
+  const sideboard = deck.sideboard.map((card) => {
+    const obj = findCard(card.name);
+    return `${card.count} ${obj.number}`;
+  }).join('\t');
+  return `${name}\n${maindeck}\n${sideboard}`;
+}
 
 export default {
   data() {
@@ -79,11 +99,13 @@ export default {
         deckName: '',
         newDeckName: '',
       },
+      deckCodeURL: '',
       deck: { maindeck: [], sideboard: [] },
     };
   },
   methods: {
     parseInput() {
+      this.deckCodeURL = '';
       const deck = {
         maindeck: [],
         sideboard: [],
@@ -186,6 +208,12 @@ export default {
       this.deck = this.$store.getters.currentDeck;
       this.maindeck = this.deck.maindeck.map((card) => `${card.count} ${card.name}`).join('\n');
       this.sideboard = this.deck.sideboard.map((card) => `${card.count} ${card.name}`).join('\n');
+      this.deckCodeURL = '';
+    },
+    generateCode() {
+      const code = makeCode(this.currentDeck, this.currentDeckName);
+      const url = `${window.location.origin}/deck?deck=${btoa(code)}`;
+      this.deckCodeURL = url;
     },
   },
   mounted() {

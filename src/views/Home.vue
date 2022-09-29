@@ -11,7 +11,7 @@
         <img src='@/assets/discord-logo.svg'>Join our Discord
       </a>
     </div>
-    <p class="version">Innistrad Exhumed 4.6</p>
+    <p class="version">Innistrad Exhumed 4.9</p>
   </div>
 </template>
 

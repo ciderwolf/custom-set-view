@@ -2,34 +2,34 @@
   <div id="card-detail" v-if="card">
     <h1 id="title">{{ card.name }}</h1>
     <div style="display: flex;">
-        <div style="display: flex; flex-direction: column;">
-            <div id="card-container">
-              <Card :card="card" size="large"/>
-            </div>
-            <button id="add-to-deck" class="button" @click="addCardClicked()">
-              Add to {{ shift ? "Sideboard" : "Deck" }}</button>
+      <div style="display: flex; flex-direction: column;">
+        <div id="card-container">
+          <Card :card="card" size="large" />
         </div>
-        <div id="card-text">
-          <div class="card-detail" v-for="face in faces" :key="face.name">
-            <div class="card-element card-title">
-              <b>{{ face.name }}</b>
-              <div>
-                <div v-if="face.cost">
-                  <abbr v-for="(letter, index) in face.cost" :key="index"
-                    class="card-symbol" :class="`card-symbol-${letter}`"></abbr>
-                </div>
+        <button id="add-to-deck" class="button" @click="addCardClicked()">
+          Add to {{ shift ? "Sideboard" : "Deck" }}</button>
+      </div>
+      <div id="card-text">
+        <div class="card-detail" v-for="face in faces" :key="face.name">
+          <div class="card-element card-title">
+            <b>{{ face.name }}</b>
+            <div>
+              <div v-if="face.cost">
+                <abbr v-for="(letter, index) in face.cost" :key="index" class="card-symbol"
+                  :class="`card-symbol-${letter}`"></abbr>
               </div>
             </div>
-            <p class="card-element">{{ face.typeline }}</p>
-            <p class="card-element" v-html="face.html"></p>
-            <i class="card-element" v-if="face.flavor" v-html="processText(face.flavor)"></i>
-            <b class="card-element" v-if="face.power && face.toughness">
-              {{ face.power }}/{{ face.toughness }}
-            </b>
           </div>
+          <p class="card-element">{{ face.typeline }}</p>
+          <p class="card-element" v-html="face.html"></p>
+          <i class="card-element" v-if="face.flavor" v-html="processText(face.flavor)"></i>
+          <b class="card-element" v-if="face.power && face.toughness">
+            {{ face.power }}/{{ face.toughness }}
+          </b>
         </div>
+      </div>
     </div>
-    <added-cards ref="addedCards"/>
+    <added-cards ref="addedCards" />
   </div>
 </template>
 
@@ -121,7 +121,9 @@ export default {
   text-align: center;
 }
 
-p, .card-detail > i, b {
+p,
+.card-detail>i,
+b {
   font-family: MPlantin, serif;
   font-size: 14pt;
   margin: 5px 0;
@@ -196,5 +198,17 @@ p, .card-detail > i, b {
 @font-face {
   font-family: MPlantin;
   src: url("../assets/MPlantin.woff");
+}
+
+@font-face {
+  font-family: MPlantin-Italic;
+  font-style: italic;
+  src: url("../assets/MPlantin-Italic.woff");
+}
+</style>
+
+<style>
+.card-detail i {
+  font-family: "MPlantin-Italic", "MPlantin", serif !important;
 }
 </style>
