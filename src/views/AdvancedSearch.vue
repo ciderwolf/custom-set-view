@@ -100,27 +100,28 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
 
 function colorInputs() {
   const separator = excludeUnselectedColors.value ? '!' : ':';
-  const query = Object.entries(color.value).map((entry) => {
+  const query = Object.entries(color).map((entry) => {
     const [key, value] = entry;
     if (value) {
       return key;
     }
     return '';
   });
-  if (query.length === 0) {
+  const queryText = query.join('');
+  if (queryText.length === 0) {
     return '';
   }
-  return separator + query.join('');
+  return separator + queryText;
 }
 function rarityInputs() {
-  const query = Object.entries(rarity.value).map((entry) => {
+  const query = Object.entries(rarity).map((entry) => {
     const [key, value] = entry;
     if (value) {
       return key;
@@ -142,7 +143,11 @@ function advancedSearch() {
   const queries = Object.entries(inputs).map((entry) => {
     const [key, value] = entry;
     if (value) {
-      return key + value;
+      if (value.trim().includes(" ") && key != 'r:') {
+        return '(' + value.trim().split(" ").map(v => key + v).join(' ') + ')'
+      } else {
+        return key + value;
+      }
     }
     return undefined;
   }).filter((x) => x !== undefined);
@@ -150,7 +155,7 @@ function advancedSearch() {
   if (queries.length === 0) {
     router.push('/search');
   } else {
-    const url = `/search?q=(${queries.join(') (')})`;
+    const url = `/search?q=${queries.join(' ')}`;
     router.push(url);
   }
 }
@@ -161,13 +166,13 @@ function keyPress(e: KeyboardEvent) {
   }
 }
 
-const rarity = ref({
+const rarity = reactive({
   common: false,
   uncommon: false,
   rare: false,
   mythic: false
 });
-const color = ref({
+const color = reactive({
   w: false,
   u: false,
   b: false,
