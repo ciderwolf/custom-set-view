@@ -1,10 +1,75 @@
+<script setup lang="ts">
+import { getCards } from '@/search';
+import CardImage from '@/components/CardImage.vue';
+import AddedCards from '@/components/AddedCards.vue';
+import { onMounted, onUnmounted, ref } from 'vue';
+import type { Card, CardBack } from '@/card';
+import { useNotificationStore } from '@/stores/notifications';
+import { useRoute, useRouter } from 'vue-router';
+
+const shift = ref(false);
+const card = ref<Card | undefined>(undefined);
+const faces = ref<CardBack[]>([]);
+const notifications = useNotificationStore();
+const route = useRoute();
+const router = useRouter();
+
+function processText(input: string) {
+  let text = input.replace(/(\(.*\))/g, '<i>$1</i>');
+  text = text.replace(/^(\w+ )—/gm, '<i>$1</i>—');
+  text = text.replace(/(.*)\n/g, '<p>$1</p>');
+  text = text.replace(/{(.)}/g, "<abbr class='card-symbol card-symbol-$1'>{$1}</abbr>");
+  text = text.replace(/\n/g, '<br/>');
+  return text;
+}
+
+function keyListener(e: KeyboardEvent) {
+  if (e.key === 'Shift') {
+    if (e.type === 'keyup') {
+      shift.value = false;
+    } else if (e.type === 'keydown') {
+      shift.value = true;
+    }
+  }
+}
+
+function addCardClicked() {
+  if (card.value) {
+    notifications.push(card.value.name, shift.value);
+  }
+}
+
+onMounted(() => {
+  const { name } = route.query;
+  card.value = getCards().find((card) => card.simple_name === name);
+  faces.value = [];
+  let face: CardBack | undefined = card.value;
+  while (face) {
+    faces.value.push(face);
+    face = face.back;
+  }
+
+  if (!card.value) {
+    router.replace(`not-found?name=${name}`);
+  }
+
+  document.addEventListener('keydown', keyListener);
+  document.addEventListener('keyup', keyListener);
+});
+
+onUnmounted(() => {
+  document.removeEventListener('keydown', keyListener);
+  document.removeEventListener('keyup', keyListener);
+});
+</script>
+
 <template>
   <div id="card-detail" v-if="card">
     <h1 id="title">{{ card.name }}</h1>
     <div style="display: flex;">
       <div style="display: flex; flex-direction: column;">
         <div id="card-container">
-          <Card :card="card" size="large" />
+          <CardImage :card="card" size="large" />
         </div>
         <button id="add-to-deck" class="button" @click="addCardClicked()">
           Add to {{ shift ? "Sideboard" : "Deck" }}</button>
@@ -29,74 +94,11 @@
         </div>
       </div>
     </div>
-    <added-cards ref="addedCards" />
   </div>
+  <AddedCards />
 </template>
 
-<script>
-import { getCards } from '@/search';
-import Card from '@/components/Card.vue';
-import AddedCards from '@/components/AddedCards.vue';
-
-export default {
-  data() {
-    return {
-      card: null,
-      shift: false,
-    };
-  },
-  methods: {
-    addCardClicked() {
-      this.$refs.addedCards.push(this.card.name, this.shift);
-    },
-    processText(input) {
-      let text = input.replace(/(\(.*\))/g, '<i>$1</i>');
-      text = text.replace(/^(\w+ )—/gm, '<i>$1</i>—');
-      text = text.replace(/(.*)\n/g, '<p>$1</p>');
-      text = text.replace(/{(.)}/g, "<abbr class='card-symbol card-symbol-$1'>{$1}</abbr>");
-      text = text.replace(/\n/g, '<br/>');
-      return text;
-    },
-    keyListener(e) {
-      if (e.key === 'Shift') {
-        if (e.type === 'keyup') {
-          this.shift = false;
-        } else if (e.type === 'keydown') {
-          this.shift = true;
-        }
-      }
-    },
-  },
-  name: 'CardDetail',
-  mounted() {
-    const { name } = this.$route.query;
-    this.card = getCards().find((card) => card.simple_name === name);
-    this.faces = [];
-    let face = this.card;
-    while (face) {
-      this.faces.push(face);
-      face = face.back;
-    }
-
-    if (!this.card) {
-      this.$router.replace(`not-found?name=${name}`);
-    }
-  },
-  created() {
-    document.addEventListener('keydown', this.keyListener);
-    document.addEventListener('keyup', this.keyListener);
-  },
-  destroyed() {
-    document.removeEventListener('keydown', this.keyListener);
-    document.removeEventListener('keyup', this.keyListener);
-  },
-  components: { Card, AddedCards },
-};
-</script>
-
 <style scoped>
-@import "../assets/symbols.css";
-
 #card-detail {
   width: 80%;
   margin: 8px auto;
@@ -208,6 +210,8 @@ b {
 </style>
 
 <style>
+@import "@/assets/symbols.css";
+
 .card-detail i {
   font-family: "MPlantin-Italic", "MPlantin", serif !important;
 }

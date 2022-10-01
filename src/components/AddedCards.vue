@@ -1,3 +1,21 @@
+<script setup lang="ts">
+import { useNotificationStore } from '@/stores/notifications';
+import { storeToRefs } from 'pinia';
+import { onUnmounted } from 'vue';
+
+const notificationStore = useNotificationStore();
+
+const { notifications } = storeToRefs(notificationStore);
+
+function removeNotification(index: number) {
+  notificationStore.removeNotification(index);
+}
+
+onUnmounted(() => {
+  notificationStore.clear();
+})
+</script>
+
 <template>
   <div class="added-cards">
     <div class="slide-in from-left show" @click="removeNotification(index)"
@@ -8,32 +26,6 @@
     </div>
   </div>
 </template>
-
-<script>
-export default {
-  data() {
-    return {
-      notifications: [],
-    };
-  },
-  methods: {
-    push(name, sideboard = false) {
-      const preexistingAlert = this.notifications
-        .find((notification) => notification.name === name && notification.sideboard === sideboard);
-      if (preexistingAlert !== undefined) {
-        preexistingAlert.count += 1;
-      } else {
-        this.notifications.push({ name, sideboard, count: 1 });
-      }
-      this.$decks.addCardToCurrentDeck(name, 1, sideboard);
-    },
-    removeNotification(index) {
-      this.notifications.splice(index, 1);
-    },
-  },
-  name: 'AddedCards',
-};
-</script>
 
 <style scoped>
 .added-cards {

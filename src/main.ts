@@ -1,14 +1,15 @@
-import Vue from 'vue';
-import App from './App.vue';
-import router from './router';
-import { DecklistStore, store } from './decklist-store';
+import { createApp } from 'vue'
+import { createPinia } from 'pinia'
 
-Vue.config.productionTip = false;
+import App from './App.vue'
+import router from './router'
+import { initDeckStore } from './stores/decks'
 
-Vue.prototype.$decks = new DecklistStore();
+const app = createApp(App)
 
-new Vue({
-  router,
-  store,
-  render: (h) => h(App),
-}).$mount('#app');
+app.use(createPinia())
+initDeckStore();
+
+app.use(router)
+
+app.mount('#app')

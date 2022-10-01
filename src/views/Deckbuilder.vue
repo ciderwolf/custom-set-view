@@ -14,8 +14,7 @@
         <h2>Deck Options</h2>
         <div class="option">
           <label for="deck-selector">Select Deck: </label>
-          <select
-            v-model="options.selectedDeck">
+          <select v-model="options.selectedDeck">
             <option disabled>Choose a deck</option>
             <option v-for="name in deckNames" :key="name" :value="name">{{name}}</option>
           </select>
@@ -54,190 +53,189 @@
       <div id="input">
         <tabs :options="{ useUrlFragment: false }">
           <tab name="Maindeck">
-            <textarea id="maindeck-input" spellcheck="false"
-              placeholder="Maindeck (60 cards)" v-model="maindeck"></textarea>
+            <textarea id="maindeck-input" spellcheck="false" placeholder="Maindeck (60 cards)"
+              v-model="maindeck"></textarea>
           </tab>
           <tab name="Sideboard">
-            <textarea id="sideboard-input" spelcheck="false"
-              placeholder="Sideboard (15 cards)" v-model="sideboard"></textarea>
+            <textarea id="sideboard-input" spelcheck="false" placeholder="Sideboard (15 cards)"
+              v-model="sideboard"></textarea>
           </tab>
         </tabs>
         <button id="preview-button" class="button" @click="parseInput()">Update Preview</button>
       </div>
       <div id="deck-view">
-        <deck-preview :deck="deck"/>
+        <deck-preview :deck="deck" />
       </div>
     </div>
   </div>
 </template>
 
-<script>
-import { Tabs, Tab } from 'vue-tabs-component';
+<script setup lang="ts">
+import { Tab, Tabs } from 'vue3-tabs-component';
+// import Tabs from '@/components/tabs/Tabs.vue'
+// import Tab from '@/components/tabs/Tab.vue'
 import DeckPreview from '@/components/DeckPreview.vue';
 import { findCard } from '@/deck';
+import { useDecksStore, type Deck, type DeckCard } from '@/stores/decks';
+import { storeToRefs } from 'pinia';
+import { onMounted, ref, watch } from 'vue';
 
-function makeCode(deck, name) {
+const decks = useDecksStore();
+
+const { currentDeckName, currentDeck, deckNames } = storeToRefs(decks)
+
+function makeCode(deck: Deck, name: string) {
   const maindeck = deck.maindeck.map((card) => {
-    const obj = findCard(card.name);
+    const obj = findCard(card.name)!;
     return `${card.count} ${obj.number}`;
   }).join('\t');
   const sideboard = deck.sideboard.map((card) => {
-    const obj = findCard(card.name);
+    const obj = findCard(card.name)!;
     return `${card.count} ${obj.number}`;
   }).join('\t');
   return `${name}\n${maindeck}\n${sideboard}`;
 }
 
-export default {
-  data() {
+function parseInput() {
+  deckCodeURL.value = '';
+  const deckData: Deck = {
+    maindeck: [],
+    sideboard: [],
+  };
+
+  deckData.maindeck = maindeck.value.trim().split('\n').map((line) => {
+    if (line.trim().length === 0) {
+      return undefined;
+    }
+    let name = line;
+    const countString = line.substring(0, line.indexOf(' '));
+    let count = 1;
+    if (!Number.isNaN(Number(countString))) {
+      count = Number(countString);
+      name = line.substring(line.indexOf(' ') + 1);
+    }
     return {
-      maindeck: '',
-      sideboard: '',
-      options: {
-        exportMode: 'download',
-        selectedDeck: undefined,
-        deckName: '',
-        newDeckName: '',
-      },
-      deckCodeURL: '',
-      deck: { maindeck: [], sideboard: [] },
+      name,
+      count,
     };
-  },
-  methods: {
-    parseInput() {
-      this.deckCodeURL = '';
-      const deck = {
-        maindeck: [],
-        sideboard: [],
+  }).filter((x) => x !== undefined) as DeckCard[];
+
+  deckData.sideboard = sideboard.value.trim().split('\n').map((line) => {
+    let name = line;
+    const countString = line.substring(0, line.indexOf(' '));
+    let count = 1;
+    if (!Number.isNaN(Number(countString))) {
+      count = Number(countString);
+      name = line.substring(line.indexOf(' ') + 1);
+    }
+    if (count !== 0) {
+      return {
+        name,
+        count,
       };
+    }
+    return undefined;
+  }).filter((x) => x !== undefined) as DeckCard[];
+  decks.setDeck(deckData);
 
-      deck.maindeck = this.maindeck.trim().split('\n').map((line) => {
-        if (line.trim().length === 0) {
-          return undefined;
-        }
-        let name = line;
-        const countString = line.substring(0, line.indexOf(' '));
-        let count = 1;
-        if (!Number.isNaN(Number(countString))) {
-          count = Number(countString);
-          name = line.substring(line.indexOf(' ') + 1);
-        }
-        return {
-          name,
-          count,
-        };
-      }).filter((x) => x !== undefined);
+  deck.value = deckData;
+}
 
-      deck.sideboard = this.sideboard.trim().split('\n').map((line) => {
-        let name = line;
-        const countString = line.substring(0, line.indexOf(' '));
-        let count = 1;
-        if (!Number.isNaN(Number(countString))) {
-          count = Number(countString);
-          name = line.substring(line.indexOf(' ') + 1);
-        }
-        if (count !== 0) {
-          return {
-            name,
-            count,
-          };
-        }
-        return undefined;
-      }).filter((x) => x !== undefined);
-      this.$decks.setCurrentDeck(deck);
-      this.deck = deck;
-    },
-    showModal() {
-      document.getElementById('deck-options').style.display = 'block';
-    },
-    dismissModal(e = null) {
-      const modal = document.getElementById('deck-options');
-      if (e === null || e.target === modal) {
-        modal.style.display = 'none';
-      }
-    },
-    deckSize(name) {
-      const deck = this.currentDeck[name];
-      const size = deck.reduce((acc, item) => acc + item.count, 0);
-      return size;
-    },
-    renameDeck() {
-      this.$decks.setCurrentDeckName(this.options.deckName);
-      this.options.selectedDeck = this.options.deckName;
-      this.dismissModal();
-    },
-    createNewDeck() {
-      this.deck = this.$decks.createNewDeck(this.options.newDeckName);
-      this.dismissModal();
-      this.chooseDeck();
-    },
-    selectDeck() {
-      this.$decks.selectDeck(this.options.selectedDeck);
-      this.dismissModal();
-      this.chooseDeck();
-    },
-    deleteDeck() {
-      this.$decks.deleteCurrentDeck();
-      this.options.selectedDeck = this.$store.getters.currentDeckName;
-      this.dismissModal();
-      this.chooseDeck();
-    },
-    exportDeck() {
-      const mode = this.options.exportMode;
-      const text = `${this.maindeck}\n\n${this.sideboard}`;
-      if (mode === 'clipboard') {
-        const el = document.createElement('textarea');
-        el.value = text;
-        document.body.appendChild(el);
-        el.select();
-        document.execCommand('copy');
-        document.body.removeChild(el);
-      } else if (mode === 'download') {
-        const url = window.URL.createObjectURL(new Blob([text], { type: 'text/plain' }));
-        const a = document.createElement('a');
-        a.style.display = 'none';
-        a.href = url;
-        a.download = `${this.currentDeckName}.txt`;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        a.remove();
-      }
-    },
-    chooseDeck() {
-      this.deck = this.$store.getters.currentDeck;
-      this.maindeck = this.deck.maindeck.map((card) => `${card.count} ${card.name}`).join('\n');
-      this.sideboard = this.deck.sideboard.map((card) => `${card.count} ${card.name}`).join('\n');
-      this.deckCodeURL = '';
-    },
-    generateCode() {
-      const code = makeCode(this.currentDeck, this.currentDeckName);
-      const url = `${window.location.origin}/deck?deck=${btoa(code)}`;
-      this.deckCodeURL = url;
-    },
-  },
-  mounted() {
-    this.options.selectedDeck = this.currentDeckName;
-    this.chooseDeck();
-  },
-  watch: {
-    'options.selectedDeck': function selectedDeckUpdated() {
-      this.selectDeck();
-    },
-  },
-  computed: {
-    currentDeckName() {
-      return this.$store.getters.currentDeckName;
-    },
-    currentDeck() {
-      return this.$store.getters.currentDeck;
-    },
-    deckNames() {
-      return this.$store.getters.deckNames;
-    },
-  },
-  components: { Tab, Tabs, DeckPreview },
-};
+
+function showModal() {
+  const modal = document.getElementById('deck-options');
+  if (modal) {
+    modal.style.display = 'block';
+  }
+}
+
+function dismissModal(e: MouseEvent | null = null) {
+  const modal = document.getElementById('deck-options');
+  if (modal && (e === null || e.target === modal)) {
+    modal.style.display = 'none';
+  }
+}
+
+function deckSize(name: keyof Deck) {
+  const deck = currentDeck.value[name];
+  const size = deck.reduce((acc, item) => acc + item.count, 0);
+  return size;
+}
+
+function renameDeck() {
+  decks.renameCurrentDeck(options.value.deckName);
+  options.value.selectedDeck = options.value.deckName;
+  dismissModal();
+}
+function createNewDeck() {
+  deck.value = decks.createNewDeck(options.value.newDeckName);
+  dismissModal();
+  chooseDeck();
+}
+function selectDeck() {
+  decks.selectDeck(options.value.selectedDeck);
+  dismissModal();
+  chooseDeck();
+}
+function deleteDeck() {
+  decks.deleteCurrentDeck();
+  options.value.selectedDeck = decks.currentDeckName;
+  dismissModal();
+  chooseDeck();
+}
+function exportDeck() {
+  const mode = options.value.exportMode;
+  const text = `${maindeck.value}\n\n${sideboard.value}`;
+  if (mode === 'clipboard') {
+    const el = document.createElement('textarea');
+    el.value = text;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+  } else if (mode === 'download') {
+    const url = window.URL.createObjectURL(new Blob([text], { type: 'text/plain' }));
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = url;
+    a.download = `${currentDeckName}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    a.remove();
+  }
+}
+function chooseDeck() {
+  deck.value = decks.currentDeck;
+  maindeck.value = deck.value.maindeck.map((card) => `${card.count} ${card.name}`).join('\n');
+  sideboard.value = deck.value.sideboard.map((card) => `${card.count} ${card.name}`).join('\n');
+  deckCodeURL.value = '';
+}
+function generateCode() {
+  const code = makeCode(currentDeck.value, currentDeckName.value);
+  const url = `${window.location.origin}/deck?deck=${btoa(code)}`;
+  deckCodeURL.value = url;
+}
+const maindeck = ref('');
+const sideboard = ref('');
+
+const deckCodeURL = ref('');
+const deck = ref<Deck>({ maindeck: [], sideboard: [] });
+const options = ref({
+  exportMode: 'download',
+  selectedDeck: '',
+  deckName: '',
+  newDeckName: '',
+});
+
+onMounted(() => {
+  options.value.selectedDeck = currentDeckName.value;
+  chooseDeck();
+})
+
+watch([() => options.value.selectedDeck], () => {
+  selectDeck();
+})
 </script>
 
 <style>
@@ -294,9 +292,11 @@ export default {
   cursor: pointer;
   transition: 0.3s;
 }
+
 .button:hover {
   background: #0001;
 }
+
 .button:hover:active {
   background: #0003;
 }
@@ -305,9 +305,11 @@ export default {
   border-color: maroon;
   color: maroon;
 }
+
 .button.danger:hover {
   background: #80000011;
 }
+
 .button.danger:hover:active {
   background: #80000033;
 }
@@ -339,8 +341,8 @@ export default {
 
 #options-button:hover {
   cursor: pointer;
-  -webkit-filter: drop-shadow( 3px 3px 2px rgba(0, 0, 0, 0.3));
-  filter: drop-shadow( 0px 0px 3px rgba(0, 0, 0, 0.3));
+  -webkit-filter: drop-shadow(3px 3px 2px rgba(0, 0, 0, 0.3));
+  filter: drop-shadow(0px 0px 3px rgba(0, 0, 0, 0.3));
 }
 
 #deck-options {
@@ -438,6 +440,7 @@ export default {
 #color-bar {
   display: flex;
 }
+
 .color {
   height: 7px;
 }
@@ -473,5 +476,4 @@ h3:first-child {
 .type {
   padding: 20px;
 }
-
 </style>

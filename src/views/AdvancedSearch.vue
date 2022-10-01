@@ -99,82 +99,92 @@
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 
-export default {
-  data() {
-    return {
-      rarity: {},
-      color: {},
-      name: '',
-      typeline: '',
-      mana: '',
-      text: '',
-      excludeUnselectedColors: false,
-    };
-  },
-  methods: {
-    colorInputs() {
-      const separator = this.excludeUnselectedColors ? '!' : ':';
-      const query = Object.entries(this.color).map((entry) => {
-        const [key, value] = entry;
-        if (value) {
-          return key;
-        }
-        return '';
-      });
-      if (query.length === 0) {
-        return '';
-      }
-      return separator + query.join('');
-    },
-    rarityInputs() {
-      const query = Object.entries(this.rarity).map((entry) => {
-        const [key, value] = entry;
-        if (value) {
-          return key;
-        }
-        return undefined;
-      }).filter((x) => x !== undefined);
-      return query.join(' OR r:');
-    },
-    advancedSearch() {
-      const inputs = {
-        '': this.name,
-        'o:': this.text,
-        't:': this.typeline,
-        'mana:': this.mana,
-        c: this.colorInputs(),
-        'r:': this.rarityInputs(),
-      };
+const router = useRouter();
 
-      const queries = Object.entries(inputs).map((entry) => {
-        const [key, value] = entry;
-        if (value) {
-          return key + value;
-        }
-        return undefined;
-      }).filter((x) => x !== undefined);
+function colorInputs() {
+  const separator = excludeUnselectedColors.value ? '!' : ':';
+  const query = Object.entries(color.value).map((entry) => {
+    const [key, value] = entry;
+    if (value) {
+      return key;
+    }
+    return '';
+  });
+  if (query.length === 0) {
+    return '';
+  }
+  return separator + query.join('');
+}
+function rarityInputs() {
+  const query = Object.entries(rarity.value).map((entry) => {
+    const [key, value] = entry;
+    if (value) {
+      return key;
+    }
+    return undefined;
+  }).filter((x) => x !== undefined);
+  return query.join(' OR r:');
+}
+function advancedSearch() {
+  const inputs = {
+    '': name.value,
+    'o:': text.value,
+    't:': typeline.value,
+    'mana:': mana.value,
+    c: colorInputs(),
+    'r:': rarityInputs(),
+  };
 
-      if (queries.length === 0) {
-        this.$router.push('/search');
-      } else {
-        const url = `/search?q=(${queries.join(') (')})`;
-        this.$router.push(url);
-      }
-    },
-    keyPress(e) {
-      if (e.key === 'Enter') {
-        this.advancedSearch();
-      }
-    },
-  },
-};
+  const queries = Object.entries(inputs).map((entry) => {
+    const [key, value] = entry;
+    if (value) {
+      return key + value;
+    }
+    return undefined;
+  }).filter((x) => x !== undefined);
+
+  if (queries.length === 0) {
+    router.push('/search');
+  } else {
+    const url = `/search?q=(${queries.join(') (')})`;
+    router.push(url);
+  }
+}
+
+function keyPress(e: KeyboardEvent) {
+  if (e.key === 'Enter') {
+    advancedSearch();
+  }
+}
+
+const rarity = ref({
+  common: false,
+  uncommon: false,
+  rare: false,
+  mythic: false
+});
+const color = ref({
+  w: false,
+  u: false,
+  b: false,
+  r: false,
+  g: false,
+  c: false
+});
+const name = ref('');
+const typeline = ref('');
+const mana = ref('');
+const text = ref('');
+const excludeUnselectedColors = ref(false);
 </script>
 
 <style scoped>
-
 @import "//cdn.jsdelivr.net/npm/mana-font@latest/css/mana.css";
+
 #heron-logo {
   margin-top: 1.5em;
   padding-right: 15px;
@@ -265,9 +275,10 @@ export default {
   margin: 0 8px 0 0;
   transition: 60ms linear;
 }
+
 .row input[type=checkbox]:hover {
   border-color: #555;
-  box-shadow: 2px 0px 4px 0 rgba(0,0,0,0.3);
+  box-shadow: 2px 0px 4px 0 rgba(0, 0, 0, 0.3);
 }
 
 .row input[type=checkbox]:checked:before {
@@ -329,7 +340,8 @@ export default {
   }
 
   #colors {
-    flex-wrap: wrap;;
+    flex-wrap: wrap;
+    ;
   }
 
   #color-exun-container {

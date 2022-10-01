@@ -1,16 +1,13 @@
 <template>
   <router-link :to="`/search?q=${query}`" class="code-example">
     <code>{{ query }}</code>
-    <br/>
-    <slot/>
+    <br />
+    <slot />
   </router-link>
 </template>
 
-<script>
-export default {
-  name: 'SyntaxHelp',
-  props: ['query'],
-};
+<script setup lang="ts">
+defineProps<{ query: string }>()
 </script>
 
 <style scoped>

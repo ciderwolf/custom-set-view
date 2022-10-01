@@ -14,11 +14,14 @@
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
 import { cardFromNumber } from '@/deck';
 import DeckPreview from '@/components/DeckPreview.vue';
+import { useDecksStore, type Deck } from '@/stores/decks';
+import { useRoute, useRouter } from 'vue-router';
+import { onMounted, ref } from 'vue';
 
-function parseDeck(code) {
+function parseDeck(code: string) {
   const [name, maindeck, sideboard] = code.split('\n');
   const main = maindeck.split('\t').map((line) => {
     const [count, num] = line.split(' ').map(Number);
@@ -43,36 +46,30 @@ function parseDeck(code) {
   };
 }
 
-export default {
-  data() {
-    return {
-      deck: {},
-      name: '',
-    };
-  },
-  methods: {
-    openDeckbuilder() {
-      this.$decks.addDeck(this.name, this.deck);
-      this.$router.push('/deckbuilder');
-    },
-  },
-  components: { DeckPreview },
-  name: 'SharedDeck',
-  mounted() {
-    try {
-      const deckCode = this.$route.query.deck;
-      const { name, deck } = parseDeck(atob(deckCode));
-      this.deck = deck;
-      this.name = name;
-    } catch (e) {
-      console.error(e.message);
-    }
-  },
-};
+const deck = ref<Deck>({ maindeck: [], sideboard: [] });
+const name = ref("");
+const decks = useDecksStore();
+const router = useRouter();
+const route = useRoute();
+
+onMounted(() => {
+  try {
+    const deckCode = route.query.deck as string;
+    const result = parseDeck(atob(deckCode));
+    deck.value = result.deck as Deck;
+    name.value = result.name;
+  } catch (e: any) {
+    console.error(e.message);
+  }
+})
+
+function openDeckbuilder() {
+  decks.addDeckNamed(name.value, deck.value);
+  router.push('/deckbuilder');
+}
 </script>
 
 <style scoped>
-
 .title {
   display: flex;
   justify-content: space-between;

@@ -1,7 +1,7 @@
 type CardColor = 'U' | 'W' | 'B' | 'R' | 'G' | 'C' | 'Gld' | 'Lnd';
 export type ColorKey = 'White' | 'Blue' | 'Black' | 'Red' | 'Green'
 type CardRarity = 'C' | 'U' | 'R' | 'M';
-interface CardBack {
+export interface CardBack {
   name: string;
   simple_name: string;
   color: string;

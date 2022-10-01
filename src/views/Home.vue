@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <img src="@/assets/heron_large.png" width=256>
-    <form @submit="search">
+    <form @submit.prevent="search">
       <input type="text" placeholder="Search for cards..." v-model="searchText" id="search-field">
     </form>
     <i class="nav-hint">or press Enter to see all cards</i>
@@ -15,34 +15,32 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'Home',
-  data() {
-    return {
-      searchText: '',
-    };
-  },
-  methods: {
-    search(e) {
-      this.$router.push(`/search?q=${this.searchText}`);
-      e.preventDefault();
-    },
-    keyPressed(e) {
-      if (e.keyCode === 13) {
-        this.$router.push(`/search?q=${this.searchText}`);
-      }
-    },
-  },
-  created() {
-    window.addEventListener('keypress', this.keyPressed);
-  },
-  destroyed() {
-    window.removeEventListener('keypress', this.keyPressed);
-  },
-  components: {
-  },
-};
+<script setup lang="ts">
+import { onMounted, onUnmounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+
+const searchText = ref("");
+function search() {
+  router.push(`/search?q=${searchText.value}`);
+  // e.preventDefault();
+}
+
+function keyPressed(e: KeyboardEvent) {
+  if (e.keyCode === 13) {
+    router.push(`/search?q=${searchText.value}`);
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('keypress', keyPressed);
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keypress', keyPressed);
+})
+
 </script>
 
 <style scoped>

@@ -1,6 +1,6 @@
 <template>
   <div>
-      <div style="display: flex;">
+    <div style="display: flex;">
       <router-link to="/"><img src="@/assets/heron_small.png" id="heron-logo" /></router-link>
       <h1>Search Syntax</h1>
     </div>
@@ -17,18 +17,19 @@
             <code>u</code>.
           </p>
           <p>You can use <code>c</code> to find cards which are colorless, and
-            <code>m</code> to find multicolor cards.</p>
+            <code>m</code> to find multicolor cards.
+          </p>
           <p>Use the <code>c!</code> keyword instead of <code>c:</code> to exclude
             cards which don’t match the specified colors.</p>
         </div>
         <div class="detail-example">
-          <syntax-example  query="c:rg">
+          <syntax-example query="c:rg">
             <span>Cards that are red or green</span>
           </syntax-example>
-          <syntax-example  query="c!rg">
+          <syntax-example query="c!rg">
             <span>Cards that are red or green but not white, blue, or black</span>
           </syntax-example>
-          <syntax-example  query="c!rgm">
+          <syntax-example query="c!rgm">
             <span>Multicolor cards which are red and green but not white, blue, or
               black <i>(ie. only Gruul cards)</i></span>
           </syntax-example>
@@ -43,7 +44,7 @@
             keywords. You can search for any supertype, card type, or subtype.</p>
         </div>
         <div class="detail-example">
-          <syntax-example  query="t:werewolf">
+          <syntax-example query="t:werewolf">
             <span>Cards which are werewolves</span>
           </syntax-example>
         </div>
@@ -59,7 +60,7 @@
           <p>You can use <code>~</code> in your text as a placeholder for the card’s name.</p>
         </div>
         <div class="detail-example">
-          <syntax-example  query='o:"When ~ enters the battlefield"'>
+          <syntax-example query='o:"When ~ enters the battlefield"'>
             <span>Cards with an ability that triggers when they enter the battlefield</span>
           </syntax-example>
         </div>
@@ -81,7 +82,7 @@
             in braces.</p>
         </div>
         <div class="detail-example">
-          <syntax-example  query="mana:2W">
+          <syntax-example query="mana:2W">
             <span>Cards which cost exactly two generic and one white mana</span>
           </syntax-example>
         </div>
@@ -98,7 +99,7 @@
           </p>
         </div>
         <div class="detail-example">
-          <syntax-example  query="pow>3 tou<=3">
+          <syntax-example query="pow>3 tou<=3">
             <span>Cards with power greater than three and toughness less than
               or equal to three.</span>
           </syntax-example>
@@ -117,10 +118,10 @@
           </p>
         </div>
         <div class="detail-example">
-          <syntax-example  query="is:transform t:werewolf">
+          <syntax-example query="is:transform t:werewolf">
             <span>Werewolves which transform.</span>
           </syntax-example>
-          <syntax-example  query="is:aftermath c!r">
+          <syntax-example query="is:aftermath c!r">
             <span>Aftermath cards where both halves are red.</span>
           </syntax-example>
         </div>
@@ -136,7 +137,7 @@
           </p>
         </div>
         <div class="detail-example">
-          <syntax-example  query="r:rare t:creature">
+          <syntax-example query="r:rare t:creature">
             <span>Creature cards printed at rare.</span>
           </syntax-example>
         </div>
@@ -145,26 +146,22 @@
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
 import SyntaxExample from '@/components/SyntaxExample.vue';
-
-export default {
-  name: 'SyntaxHelp',
-  components: { SyntaxExample },
-};
 </script>
 
 <style scoped>
-
 #heron-logo {
   margin-top: 1.5em;
   padding-right: 15px;
 }
+
 #navigation {
   position: absolute;
   right: 30px;
   top: 30px;
 }
+
 #navigation a:first-child {
   margin-right: 15px;
 }
@@ -187,7 +184,8 @@ a i {
   justify-content: space-around;
 }
 
-.detail-doc, .detail-example {
+.detail-doc,
+.detail-example {
   width: 38%;
 }
 
@@ -201,10 +199,13 @@ a i {
   .details {
     display: block;
   }
-  .detail-doc, .detail-example {
+
+  .detail-doc,
+  .detail-example {
     width: 76%;
     margin: 0 auto;
   }
+
   #navigation {
     top: 7px;
     right: 7px;

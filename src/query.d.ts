@@ -1,6 +1,6 @@
 export function parse(input: string, options: object = {}): object[];
 
-export class SyntaxError {
+export class SyntaxError extends Error {
     message: string;
     expected: object[];
     found: object;

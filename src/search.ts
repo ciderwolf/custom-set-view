@@ -1,6 +1,6 @@
 import data from '@/assets/data.json';
 import { parse } from './query';
-import { Card, CardSet, ColorKey } from './card';
+import { type Card, CardSet, type ColorKey } from './card';
 
 const set = new CardSet(data);
 
@@ -86,11 +86,15 @@ export function search(query: string): Card[] {
   if (query === undefined) {
     return [];
   }
-  const conditions = parse(query);
-  if (conditions === undefined) {
+  try {
+    const conditions = parse(query);
+    if (conditions === undefined) {
+      return [];
+    }
+    return set.cards.filter((card) => cardMatchesConditions(conditions, card));
+  } catch(e: any) {
     return [];
   }
-  return set.cards.filter((card) => cardMatchesConditions(conditions, card));
 }
 
 export function getCards(): Card[] {

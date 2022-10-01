@@ -1,34 +1,31 @@
+<script setup lang="ts">
+import type { Card } from '@/card';
+import { ref } from 'vue';
+
+defineProps<{
+  size: string;
+  card: Card;
+}>();
+
+const flipped = ref(false);
+function flip(e: MouseEvent) {
+  flipped.value = !flipped.value;
+  e.preventDefault();
+}
+</script>
+
 <template>
-  <div :id="card.simple_name"
-      class="card-grid-item"
-      :href="'/search/card?name=' + this.card.simple_name"
-      :class="{ flipped }">
+  <div :id="card.simple_name" class="card-grid-item" :href="'/search/card?name=' + card.simple_name"
+    :class="{ flipped }">
     <button v-if="card.dfc" @click="flip" class="flip-button"></button>
     <div v-if="card.dfc" class="card-faces" :class="{ flipped }">
       <img :src='`/img/${size}/transform/${card.simple_name}_front.jpg`' class="card card-front">
       <img :src='`/img/${size}/transform/${card.simple_name}_back.jpg`' class="card card-back">
     </div>
-    <img :src="`/img/${size}/img/${this.card.simple_name}.jpg`" v-else class="card">
+    <img :src="`/img/${size}/img/${card.simple_name}.jpg`" v-else class="card">
   </div>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      flipped: false,
-    };
-  },
-  methods: {
-    flip(e) {
-      this.flipped = !this.flipped;
-      e.preventDefault();
-    },
-  },
-  name: 'Card',
-  props: ['card', 'size'],
-};
-</script>
 
 <style scoped>
 .card-grid-item {
@@ -71,11 +68,12 @@ export default {
   width: 100%;
   height: 100%;
   border-radius: 4%;
-  -webkit-box-shadow: 1px 1px 6px rgba(0,0,0,0.45);
-  box-shadow: 1px 1px 6px rgba(0,0,0,0.45);
+  -webkit-box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.45);
+  box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.45);
 }
 
-.card.card-front, .card.card-back {
+.card.card-front,
+.card.card-back {
   z-index: 5;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
@@ -128,14 +126,15 @@ export default {
 }
 
 .card-grid-item .flip-button::after {
-  content: url("~@/assets/flip-day.svg");
+  content: url("@/assets/flip-day.svg");
 }
+
 .card-grid-item.flipped .flip-button {
   border-color: #FFF;
   background-color: #343242;
 }
 
 .card-grid-item.flipped .flip-button::after {
-  content: url("~@/assets/flip-night.svg");
+  content: url("@/assets/flip-night.svg");
 }
 </style>

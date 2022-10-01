@@ -7,84 +7,83 @@
       <label for="search-bar">
         <img width="20" height="20" style="margin-top: 4px" src="@/assets/magnifying-glass.png" />
       </label>
-      <input type="text" v-model="searchText" @input="searchBarInput"
-        placeholder="Search for cards..." id="search-bar">
+      <input type="text" v-model="searchText" @input="searchBarInput" placeholder="Search for cards..." id="search-bar">
       <router-link to="advanced">
-        <img width="20" height="20" id="advanced-search" style="margin-top: 4px"
-          src="@/assets/gear.svg" />
+        <img width="20" height="20" id="advanced-search" style="margin-top: 4px" src="@/assets/gear.svg" />
       </router-link>
       <p id="search-error"></p>
     </div>
     <div id="card-img">
-      <div v-for="card in results" :key="card.name" class="card-container"
-      @mouseenter="hover(card.simple_name, true)" @mouseleave="hover(undefined, false)">
+      <div v-for="card in results" :key="card.name" class="card-container" @mouseenter="hover(card.simple_name, true)"
+        @mouseleave="hover(undefined, false)">
         <router-link :to="'/search/card?name=' + card.simple_name">
-          <Card :card="card" size="small"/>
+          <CardImage :card="card" size="small" />
         </router-link>
       </div>
     </div>
     <h3 id="no-results" v-if="results.length === 0">No search results found</h3>
-    <added-cards ref="addedCards"/>
+    <added-cards ref="addedCards" />
   </div>
 </template>
 
-<script>
-import { search, getCards } from '@/search';
-import Card from '@/components/Card.vue';
+<script setup lang="ts">
+import { onMounted, onUnmounted, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { search } from '@/search';
+import { useNotificationStore } from '@/stores/notifications'
+import type { Card } from '@/card'
+import CardImage from '@/components/CardImage.vue';
 import AddedCards from '@/components/AddedCards.vue';
 
-export default {
-  data() {
-    return {
-      hasSearch: false,
-      searchText: '',
-      cards: [],
-      results: [],
-      card: undefined,
-    };
-  },
-  methods: {
-    async searchBarInput() {
-      this.search();
-      if (this.searchText !== '') {
-        this.$router.replace(`/search?q=${this.searchText}`);
-      } else {
-        this.$router.replace('/search');
-      }
-    },
-    search() {
-      this.results = search(this.searchText);
-    },
-    hover(name, on) {
-      if (on) {
-        this.card = name;
-      } else {
-        this.card = undefined;
-      }
-    },
-    keyPressed(e) {
-      if ((e.key !== 'a' && e.key !== 's') || document.activeElement === document.getElementById('search-bar')) {
-        return;
-      }
-      if (this.card) {
-        this.$refs.addedCards.push(this.card, e.key === 's');
-      }
-    },
-  },
-  mounted() {
-    this.cards = getCards();
-    this.searchText = this.$route.query.q || '';
-    this.search();
-  },
-  created() {
-    window.addEventListener('keypress', this.keyPressed);
-  },
-  destroyed() {
-    window.removeEventListener('keypress', this.keyPressed);
-  },
-  components: { Card, AddedCards },
-  name: 'Search',
-};
+const router = useRouter();
+const notifications = useNotificationStore();
+
+const searchText = ref('');
+const results = ref<Card[]>([]);
+let card: string | undefined = undefined;
+
+async function searchBarInput() {
+  executeSearch();
+  if (searchText.value !== '') {
+    router.replace(`/search?q=${searchText.value}`);
+  } else {
+    router.replace('/search');
+  }
+}
+function executeSearch() {
+  results.value = search(searchText.value);
+}
+function hover(name: string | undefined, on: boolean) {
+  if (on) {
+    card = name;
+  } else {
+    card = undefined;
+  }
+}
+
+function keyPressed(e: KeyboardEvent) {
+  if ((e.key !== 'a' && e.key !== 's') || document.activeElement?.id === 'search-bar') {
+    return;
+  }
+  if (card) {
+    notifications.push(card, e.key === 's');
+  }
+}
+
+
+
+const route = useRoute();
+
+onMounted(() => {
+  searchText.value = (route.query.q || '') as string;
+  executeSearch();
+  window.addEventListener('keypress', keyPressed);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('keypress', keyPressed);
+})
+
 </script>
 
 <style scoped>
@@ -147,8 +146,8 @@ export default {
 
 #advanced-search:hover {
   cursor: pointer;
-  -webkit-filter: drop-shadow( 3px 3px 2px rgba(0, 0, 0, 0.3));
-  filter: drop-shadow( 0px 0px 3px rgba(0, 0, 0, 0.3));
+  -webkit-filter: drop-shadow(3px 3px 2px rgba(0, 0, 0, 0.3));
+  filter: drop-shadow(0px 0px 3px rgba(0, 0, 0, 0.3));
 }
 
 #search-error {
@@ -166,6 +165,7 @@ export default {
   transition: 0.32s;
   z-index: 1;
 }
+
 #search-error.error {
   height: auto;
   padding: 10px;

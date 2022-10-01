@@ -1,13 +1,12 @@
 import { getCards } from '@/search';
-import { Card } from './card';
+import type { Card } from './card';
 
 const allCards = getCards();
 const basicLands = ['Plains', 'Island', 'Swamp', 'Mountain', 'Forest', 'Wastes'];
 
-export function findCard(name: string) {
+export function findCard(name: string): Card | null {
   if (basicLands.includes(name)) {
-    // eslint-disable-next-line @typescript-eslint/camelcase
-    return { name, simple_name: name, number: -basicLands.indexOf(name) - 1 };
+    return { name, simple_name: name, number: -basicLands.indexOf(name) - 1 } as Card;
   }
   const foundCard = Object.values(allCards)
     .find((card) => (card.name === name || card.simple_name === name));

@@ -1,22 +1,15 @@
 <template>
   <div id="error-404">
-      <div class="center">
-        <h1>Whoops!</h1>
-        <h3>It looks like that page is totally lost...</h3>
-        <router-link id="go-home" to="/">Go Home</router-link>
-      </div>
-      <img id="fblthp" src="@/assets/fblthp.png">
+    <div class="center">
+      <h1>Whoops!</h1>
+      <h3>It looks like that page is totally lost...</h3>
+      <router-link id="go-home" to="/">Go Home</router-link>
+    </div>
+    <img id="fblthp" src="@/assets/fblthp.png">
   </div>
 </template>
 
-<script>
-export default {
-  name: 'Error404',
-};
-</script>
-
 <style scoped>
-
 #fblthp {
   position: absolute;
   bottom: 0;
@@ -52,5 +45,4 @@ export default {
   background-color: white;
   border-color: rgba(41, 41, 41, 0.75);
 }
-
 </style>

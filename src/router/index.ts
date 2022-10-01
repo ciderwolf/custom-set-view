@@ -1,10 +1,7 @@
-import Vue from 'vue';
-import VueRouter, { RouteConfig } from 'vue-router';
+import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router';
 import Home from '../views/Home.vue';
 
-Vue.use(VueRouter);
-
-const routes: Array<RouteConfig> = [
+const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     name: 'Home',
@@ -62,7 +59,7 @@ const routes: Array<RouteConfig> = [
     },
   },
   {
-    path: '*',
+    path: '/:pathMatch(.*)*',
     name: 'Error 404',
     component: () => import(/* webpackChunkName: "error404" */ '../views/404.vue'),
     meta: {
@@ -71,14 +68,13 @@ const routes: Array<RouteConfig> = [
   },
 ];
 
-const router = new VueRouter({
-  mode: 'history',
-  base: process.env.BASE_URL,
+const router = createRouter({
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes,
 });
 
 router.afterEach((to) => {
-  document.title = to.meta.title;
+  document.title = to.meta["title"] as string;
 });
 
 export default router;

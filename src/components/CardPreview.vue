@@ -1,51 +1,52 @@
 <template>
   <div>
-    <img :style="style" class="card-preview" :src="`/img/large/img/${card.simpleName}.jpg`"/>
-    <p
-      class="card-line"
-      @mouseleave="mouseLeave"
-      @mouseover="mouseOver"
-      @mousemove="mouseMove"
-    >{{ card.count }} {{ card.name }}</p>
+    <img :style="style" class="card-preview" :src="`/img/large/img/${card.simpleName}.jpg`" />
+    <p class="card-line" @mouseleave="mouseLeave" @mouseover="mouseOver" @mousemove="mouseMove">{{ card.count }} {{
+    card.name }}</p>
   </div>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      style: {
-        display: 'none',
-        left: 0,
-        top: 0,
-      },
-      height: 330,
-    };
-  },
-  methods: {
-    normalizePreviewY(e) {
-      let newY = e.pageY;
-      if (newY + this.height > window.innerHeight + window.scrollY) {
-        newY = window.innerHeight + window.scrollY - this.height;
-      }
-      return newY;
-    },
-    mouseLeave() {
-      this.style.display = 'none';
-    },
-    mouseOver(e) {
-      this.style.display = 'inline';
-      this.style.left = e.pageX.toString();
-      this.style.top = `${this.normalizePreviewY(e)}px`;
-    },
-    mouseMove(e) {
-      this.style.left = `${e.pageX.toString()}px`;
-      this.style.top = `${this.normalizePreviewY(e)}px`;
-    },
-  },
-  props: ['card'],
-  name: 'CardPreview',
-};
+<script setup lang="ts">
+import { computed, ref } from 'vue';
+import type { DeckCard } from '@/stores/decks';
+interface Card extends DeckCard {
+  count: number;
+  name: string;
+  simpleName: string;
+}
+
+defineProps<{ card: Card }>();
+
+const display = ref("none");
+const left = ref(0);
+const top = ref(0);
+const height = 330;
+
+const style = computed(() => ({
+  display: display.value,
+  left: `${left.value}px`,
+  top: `${top.value}px`
+}))
+
+function normalizePreviewY(e: MouseEvent) {
+  let newY = e.pageY;
+  if (newY + height > window.innerHeight + window.scrollY) {
+    newY = window.innerHeight + window.scrollY - height;
+  }
+  return newY;
+}
+function mouseLeave() {
+  display.value = 'none';
+}
+function mouseOver(e: MouseEvent) {
+  display.value = 'inline';
+  left.value = e.pageX;
+  top.value = normalizePreviewY(e);
+}
+function mouseMove(e: MouseEvent) {
+  left.value = e.pageX;
+  top.value = normalizePreviewY(e);
+}
 </script>
 
 <style scoped>
