@@ -24,10 +24,9 @@ export const useDecksStore = defineStore({
     },
     renameCurrentDeck(newName: string) {
       const deck = this.decklists[this.currentDeckName];
-      // Vue.delete(this.decklists, this.currentDeckName);
       delete this.decklists[this.currentDeckName];
+
       this.currentDeckName = newName;
-      // Vue.set(this.decklists, this.currentDeckName, deck);
       this.decklists[this.currentDeckName] = deck;
     },
     addDeck() {
@@ -36,23 +35,19 @@ export const useDecksStore = defineStore({
       while (Object.keys(this.decklists).includes(name)) {
         count += 1;
         name = `${this.currentDeckName} (${count})`;
-      }this
-      console.log(name, this.currentDeckName, Object.keys(this.decklists));
+      }
+      
       if (name !== this.currentDeckName) {
         this.currentDeckName = name;
       }
       this.decklists[this.currentDeckName] = { maindeck: [], sideboard: [] }
-      // Vue.set(this.decklists, this.currentDeckName, { maindeck: [], sideboard: [] });
     },
     removeDeck() {
-      // Vue.delete(this.decklists, this.currentDeckName);
       delete this.decklists[this.currentDeckName];
     },
     setDeck(deck: Deck) {
-      // Vue.set(this.decklists, this.currentDeckName, deck);
       this.decklists[this.currentDeckName] = deck;
     },
-
 
     // utils
     addCardToCurrentDeck(cardName: string, count = 1, sideboard = false) {
