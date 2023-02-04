@@ -23,6 +23,9 @@
       "dom",
       "dom.iterable",
       "scripthost"
+    ],
+    "types": [
+      "vite/client"
     ]
   },
   "include": [
