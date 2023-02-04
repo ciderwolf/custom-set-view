@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="syntax-help-view">
     <div style="display: flex;">
       <router-link to="/"><img src="@/assets/heron_small.png" id="heron-logo" /></router-link>
       <h1>Search Syntax</h1>
@@ -151,6 +151,10 @@ import SyntaxExample from '@/components/SyntaxExample.vue';
 </script>
 
 <style scoped>
+#syntax-help-view {
+  padding: 5px;
+}
+
 #heron-logo {
   margin-top: 1.5em;
   padding-right: 15px;
@@ -175,7 +179,7 @@ a i {
   opacity: 0.7;
 }
 
-.modifier {
+.modifier:not(:last-child) {
   border-bottom: 2px solid #ddd;
 }
 

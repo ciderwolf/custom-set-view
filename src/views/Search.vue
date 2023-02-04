@@ -92,6 +92,7 @@ onUnmounted(() => {
   flex-flow: row wrap;
   width: 80%;
   margin: 0 auto;
+  margin-bottom: 25px;
 }
 
 .card-container {
@@ -132,7 +133,7 @@ onUnmounted(() => {
 #search-container {
   display: flex;
   justify-content: center;
-  margin: 20px 0px;
+  padding: 20px 0px;
 }
 
 #search-bar {

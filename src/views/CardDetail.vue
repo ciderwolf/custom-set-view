@@ -72,7 +72,7 @@ onUnmounted(() => {
           <CardImage :card="card" size="large" />
         </div>
         <button id="add-to-deck" class="button" @click="addCardClicked()">
-          Add to {{ shift ? "Sideboard" : "Deck" }}</button>
+          Add to {{ shift? "Sideboard": "Deck" }}</button>
       </div>
       <div id="card-text">
         <div class="card-detail" v-for="face in faces" :key="face.name">
@@ -101,7 +101,7 @@ onUnmounted(() => {
 <style scoped>
 #card-detail {
   width: 80%;
-  margin: 8px auto;
+  margin: 0 auto;
 }
 
 #card-container {
@@ -116,7 +116,8 @@ onUnmounted(() => {
 
 #title {
   font-family: Beleren, serif;
-  margin-left: 20%;
+  margin: 0 20%;
+  padding: 22px 0;
 }
 
 #card-not-found {

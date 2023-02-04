@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="deckbuilder-view">
     <div id="title">
       <router-link to="/"><img src="@/assets/heron_small.png" id="heron-logo" /></router-link>
       <h1>Deckbuilder</h1>
@@ -16,7 +16,7 @@
           <label for="deck-selector">Select Deck: </label>
           <select v-model="options.selectedDeck">
             <option disabled>Choose a deck</option>
-            <option v-for="name in deckNames" :key="name" :value="name">{{name}}</option>
+            <option v-for="name in deckNames" :key="name" :value="name">{{ name }}</option>
           </select>
         </div>
         <hr />
@@ -72,8 +72,6 @@
 
 <script setup lang="ts">
 import { Tab, Tabs } from 'vue3-tabs-component';
-// import Tabs from '@/components/tabs/Tabs.vue'
-// import Tab from '@/components/tabs/Tab.vue'
 import DeckPreview from '@/components/DeckPreview.vue';
 import { findCard } from '@/deck';
 import { useDecksStore, type Deck, type DeckCard } from '@/stores/decks';
@@ -239,6 +237,10 @@ watch([() => options.value.selectedDeck], () => {
 </script>
 
 <style>
+#deckbuilder-view {
+  margin-left: 5px;
+}
+
 .tabs-component-tabs {
   list-style-type: none;
   display: flex;

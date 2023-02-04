@@ -24,7 +24,6 @@ const router = useRouter();
 const searchText = ref("");
 function search() {
   router.push(`/search?q=${searchText.value}`);
-  // e.preventDefault();
 }
 
 function keyPressed(e: KeyboardEvent) {
@@ -46,7 +45,8 @@ onUnmounted(() => {
 <style scoped>
 .home {
   margin: 0 auto;
-  margin-top: 15vh;
+  padding-top: 15vh;
+  box-sizing: border-box;
   width: fit-content;
   align-items: center;
   display: flex;
@@ -110,6 +110,6 @@ form {
 .version {
   color: gray;
   position: absolute;
-  bottom: 13px;
+  bottom: 25px;
 }
 </style>

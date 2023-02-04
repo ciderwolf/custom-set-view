@@ -190,6 +190,10 @@ const excludeUnselectedColors = ref(false);
 <style scoped>
 @import "//cdn.jsdelivr.net/npm/mana-font@latest/css/mana.css";
 
+#advanced-search {
+  padding-left: 5px;
+}
+
 #heron-logo {
   margin-top: 1.5em;
   padding-right: 15px;
@@ -296,12 +300,9 @@ const excludeUnselectedColors = ref(false);
 }
 
 #search-container {
-  position: fixed;
+  position: sticky;
   bottom: 0px;
-  position: fixed;
   margin: 0 auto;
-  left: 0;
-  right: 0;
   padding: 30px;
   padding-left: 25%;
   background: white;

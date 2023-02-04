@@ -12,13 +12,13 @@
 <style scoped>
 #fblthp {
   position: absolute;
-  bottom: 0;
+  bottom: 25px;
   right: 20%;
   opacity: 0.75;
 }
 
 .center {
-  margin: 100px 25%;
+  padding: 100px 25%;
   display: flex;
   flex-direction: column;
   align-items: center;
