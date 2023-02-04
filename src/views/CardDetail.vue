@@ -66,7 +66,7 @@ onUnmounted(() => {
 <template>
   <div id="card-detail" v-if="card">
     <h1 id="title">{{ card.name }}</h1>
-    <div style="display: flex;">
+    <div id="card-detail-box">
       <div style="display: flex; flex-direction: column;">
         <div id="card-container">
           <CardImage :card="card" size="large" />
@@ -102,6 +102,10 @@ onUnmounted(() => {
 #card-detail {
   width: 80%;
   margin: 0 auto;
+}
+
+#card-detail-box {
+  display: flex;
 }
 
 #card-container {
@@ -192,6 +196,30 @@ b {
 .button:focus {
   outline: none;
 }
+
+
+@media screen and (max-width: 800px) {
+  #card-detail-box {
+    flex-direction: column;
+    width: min-content;
+    margin: 0 auto;
+  }
+
+  #card-text {
+    margin: 10px 0;
+    width: 100%;
+  }
+
+  #title {
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  #card-detail {
+    width: auto;
+  }
+}
+
 
 @font-face {
   font-family: Beleren;
